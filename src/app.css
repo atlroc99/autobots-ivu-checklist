@@ -1,0 +1,68 @@
+html,
+body {
+  width: 100%;
+  background: rgb(51, 59, 63);
+}
+.logoHome {
+  margin-top: 200px;
+  width: 700px;
+  margin-left: 50%;
+  transform: translate(-50%);
+}
+
+.headerTitle {
+  text-align: center;
+  letter-spacing: 2px;
+  color: black;
+  font-family: "Times New Roman", Times, serif;
+}
+.title {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-weight: bold;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  background-color: rgb(59, 61, 61);
+}
+.fa-list-alt {
+  color: rgb(168, 8, 8);
+  margin: 10px;
+}
+.fa-hand-point-right {
+  color: rgb(168, 8, 8);
+}
+.checklistBox {
+  width: 1580px;
+  margin-left: 50px;
+  margin-top: 100px;
+  background: white;
+  padding: 15px;
+  box-shadow: 1px 2px 1px 2px rgb(212, 211, 211);
+}
+.inputBox {
+  box-shadow: 2px 2px rgb(212, 211, 211);
+}
+.idFormBox {
+  background: rgb(237, 253, 253);
+  width: 700px;
+  padding: 10px;
+  padding-top: 25px;
+  margin-bottom: 15px;
+  box-shadow: 1px 1px 2px 2px rgb(170, 224, 224);
+  border-radius: 0 10px 0 10px;
+}
+.headerLink {
+  color: black;
+  text-decoration: none;
+  padding: 10px;
+}
+.headerLink:hover {
+  color: rgb(168, 8, 8);
+  text-decoration: none;
+}
+.footerTag {
+  font-size: 12px;
+  color: rgb(192, 185, 185);
+}
