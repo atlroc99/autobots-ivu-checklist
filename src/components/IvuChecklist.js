@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button, Form, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import SearchBox from './SearchBox';
+import LiteModal from './LiteModal';
 // import {CHECKLIST_SERVICE} from './Endpoint';
 
 function IvuChecklist() {
@@ -52,7 +53,7 @@ function IvuChecklist() {
     console.log('data', data)
 
     const response = axios.post(`${url}/${customerId}`, { newData })
-    
+
     if (response) {
       console.log("test", response.data)
       alert("Data Saved Successfully!")
@@ -121,7 +122,9 @@ function IvuChecklist() {
     event.preventDefault();
     console.log('Seach Customer:', customerId);
     const response = await axios.get(`${url}/${customerId}`)
-    setTempCustomerID(customerId);
+    if (response.data) {
+      setTempCustomerID(customerId);
+    }
     console.log(response)
     const parsed_data = JSON.parse(response.data);
     console.log(parsed_data);
@@ -139,10 +142,10 @@ function IvuChecklist() {
       <div className="checklistBox">
         <fieldset>
           <Form className="p-4">
-            
-            <Form.Group id="customerId">
+
+            <Form.Group id="customerId" className="mb-3">
               <Form.Label>Enter Customer ID to update</Form.Label>
-              <Form.Control type='text' placeholder='customer ID' value={tempCustomerID} onChange={(e) => setcustomerId(e.target.value)}></Form.Control>
+              <Form.Control type='text' placeholder='customer ID' value={tempCustomerID ? tempCustomerID : ''} onChange={(e) => setcustomerId(e.target.value)}></Form.Control>
             </Form.Group>
 
             <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
@@ -318,22 +321,15 @@ function IvuChecklist() {
               <Button type="submit" disabled={false} onClick={update} variant="outline-primary" style={{ width: '200px', margin: '5px' }}><i className="fas fa-sync-alt"></i> Update</Button>
               <Button type="submit" disabled={true} onClick={submit} variant="danger" style={{ width: '200px', margin: '5px' }}><i className="fas fa-save"></i> Submit</Button>
 
-
-              <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                  <Modal.Title>Reseting Field</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Reseting will reset all the fields. Are you sure you want to reset?</Modal.Body>
-                <Modal.Footer>
-                  <Button variant="danger" onClick={reset}>
-                    Yes
-                  </Button>
-                  <Button variant="secondary" onClick={handleClose}>
-                    No
-                  </Button>
-                </Modal.Footer>
-              </Modal>
-
+              <LiteModal
+                title='Reseting Fields'
+                body='Reseting will reset all the fields. Are you sure you want to reset?'
+                show={show}
+                handleClose={handleClose}
+                onClick={reset}
+                buttonValue_1='Yes'
+                buttonValue_2='No'
+              />
             </div>
           </Form>
         </fieldset>
