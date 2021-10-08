@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Form, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import SearchBox from './SearchBox';
@@ -27,22 +27,25 @@ function IvuChecklist() {
   const [syncComplete, setSyncComplete] = useState(false);
 
   const [customerId, setcustomerId] = useState("")
-  const [allItemsSelected, isAllItemSelected] = useState(false);
   const [tempCustomerID, setTempCustomerID] = useState('')
+  const [isCheckListCompleted, setIsCheckListCompleted] = useState(false)
 
   const update = async (event) => {
     event.preventDefault();
     console.log('UPDATING!!! ')
     const data = getNewData();
     // const response = await axios.put(`${url}/${customerId}`, {data});
-    const _customerId = customerId ? customerId : 'NIL'
+    const _customerId = customerId ? customerId : 'NIL';
     console.log('customerId', _customerId)
     const response = await axios.put(`${url}/${_customerId}`, { data })
 
     if (response.data) {
       console.log('data updated', response.data)
+      const isCompleted = response.data.isComplete
+      setIsCheckListCompleted(isCompleted)
       alert('Successfully updated');
     }
+    console.log('isCheckListCompleted:', isCheckListCompleted)
     reset()
   }
 
@@ -50,18 +53,11 @@ function IvuChecklist() {
     e.preventDefault();
     const newData = getNewData();
     const data = JSON.stringify(newData)
-    console.log('data', data)
-
     const response = axios.post(`${url}/${customerId}`, { newData })
 
     if (response) {
-      console.log("test", response.data)
       alert("Data Saved Successfully!")
     }
-  }
-
-  const isAllItemsChecked = () => {
-    isAllItemSelected(Object.values(getNewData()).every(v => v === true));
   }
 
   const getNewData = () => {
@@ -85,7 +81,6 @@ function IvuChecklist() {
     }
     return newData;
   }
-
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -120,14 +115,30 @@ function IvuChecklist() {
 
   const searchCustomer = async (event) => {
     event.preventDefault();
-    console.log('Seach Customer:', customerId);
     const response = await axios.get(`${url}/${customerId}`)
     if (response.data) {
       setTempCustomerID(customerId);
     }
-    console.log(response)
     const parsed_data = JSON.parse(response.data);
-    console.log(parsed_data);
+    populateCheckBoxes(parsed_data.data)
+    
+  }
+
+  
+  const isAllItemsChecked = (data) => {
+    const allItemChecked = Object.values(data).every(value => value === true)
+    console.log('allItemChecked: ', allItemChecked)
+    return allItemChecked;
+  }
+
+
+  const populateCheckBoxes = (data) => {
+    const keys = Object.keys(data);
+    keys.forEach(key => {
+      let setStateFn = 'set' + key.charAt(0).toUpperCase() + key.slice(1)
+      const param = data[key];
+      eval(`${setStateFn}(${param})`)
+    });
   }
 
   return (
@@ -318,8 +329,8 @@ function IvuChecklist() {
         }
   */}
               <Button type="reset" onClick={handleShow} variant="outline-warning" style={{ width: '200px', margin: '5px' }}><i className="fas fa-sync-alt"></i> Reset</Button>
-              <Button type="submit" disabled={false} onClick={update} variant="outline-primary" style={{ width: '200px', margin: '5px' }}><i className="fas fa-sync-alt"></i> Update</Button>
-              <Button type="submit" disabled={true} onClick={submit} variant="danger" style={{ width: '200px', margin: '5px' }}><i className="fas fa-save"></i> Submit</Button>
+              <Button type="submit" disabled={isCheckListCompleted} onClick={update} variant="outline-primary" style={{ width: '200px', margin: '5px' }}><i className="fas fa-sync-alt"></i> Update</Button>
+              <Button type="submit" disabled={!isCheckListCompleted} onClick={submit} variant="danger" style={{ width: '200px', margin: '5px' }}><i className="fas fa-save"></i> Submit</Button>
 
               <LiteModal
                 title='Reseting Fields'
