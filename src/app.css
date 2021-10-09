@@ -66,3 +66,13 @@ body {
   font-size: 12px;
   color: rgb(192, 185, 185);
 }
+
+/* css style for search customerID */
+.searchForm {
+  margin: '100px';
+  padding-top: '50px'
+}
+
+.searchFormInput {
+  margin-left: '10px'
+}

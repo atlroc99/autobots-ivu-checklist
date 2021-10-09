@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import IvuChecklist from './components/IvuChecklist'
+// import IvuChecklist from './components/IvuChecklist'
 import Layout from './layout/Layout';
 import './app.css';
-// import { Spinner } from 'react-bootstrap';
-
+import WelcomePacketCheckList from './components/WelcomePacketCheckList';
 
 function App() {
-
-  const [sending, isSending] = useState(false)
-  console.log('isSending', sending)
 
   return (
     <div>
       <Layout>
-        <IvuChecklist isSending={isSending} />
+        <WelcomePacketCheckList/>
       </Layout>
 
       {/* {
