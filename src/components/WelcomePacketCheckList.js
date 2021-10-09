@@ -10,11 +10,13 @@ class WelcomePacketCheckList extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            checkListSubmitted: false,
             customerId: '',
-            isComplete: false,
             items: []
         };
     }
+
+    isComplete = false;
 
     async componentDidMount() {
         const checklist = await axios.get(url + '/checklist/items')
@@ -37,34 +39,35 @@ class WelcomePacketCheckList extends Component {
             return;
         }
         this.setState({ items: item })
+        this.setState({ checkListSubmitted: this.isSubmited(this.state.items) })
+        console.log('checklist-submitted', this.checkListSubmitted);
         event.target.reset();
     }
 
     handleChange = (event) => {
         let items = this.state.items;
+
         items.forEach(item => {
             if (item.name === event.target.name) {
                 item.isChecked = event.target.checked;
             }
         });
         this.setState({ items: items });
+        this.isComplete = this.state.items.every(i => i.isChecked === true);
     }
 
     update = async (e) => {
         e.preventDefault();
-        console.log('UPDATING!!! ')
-        console.log('updated items: ', this.state.items);
-
         const customerId = this.state.customerId ? this.state.customerId : 'NIL';
         const response = await axios.put(`${url}/${customerId}`, this.state.items);
-
-        console.log(response.data)
         this.setState({ isComplete: response.data.isComplete });
     }
 
-    submit = (e) => {
+
+    submit = async (e) => {
         e.preventDefault();
-        // const response = axios.post(`${url}/${customerId}`, { newData })
+        console.log('submtting data for: ', this.state.customerId);
+        const response = await axios.put(`${url}/${this.state.customerId}`, this.state.items);
     }
 
     lookupCustomerData = (event) => {
@@ -72,6 +75,10 @@ class WelcomePacketCheckList extends Component {
         console.log('value: ', this.state.customerId);
         const response = this.searchCustomer(this.state.customerId, event)
         event.preventDefault();
+    }
+
+    isSubmited(data) {
+        return data.every(item => item.isChecked === true);
     }
 
     render() {
@@ -101,23 +108,30 @@ class WelcomePacketCheckList extends Component {
                                     )
                                 })
                             }
-                            <div style={{ marginLeft: '40%' }}>
-                                <Button type="submit"
-                                    value='Update'
-                                    onClick={this.update}
-                                    variant="outline-primary"
-                                    style={{ width: '200px', margin: '5px' }}>
-                                    <span style={{ marginRight: '15px' }}>Update</span>
-                                    <i className="fas fa-sync-alt" />
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    onClick={this.submit}
-                                    variant="danger"
-                                    style={{ width: '200px', margin: '5px' }}>
-                                    <span style={{ marginRight: '15px' }}>Submit</span>
-                                    <i className="fas fa-save" />
-                                </Button>
+                            <div>
+                                {
+                                    !this.state.checkListSubmitted ?
+                                        <div style={{ marginLeft: '40%' }}>
+                                            <Button type="submit"
+                                                value='Update'
+                                                onClick={this.update}
+                                                variant="outline-primary"
+                                                disabled={this.isComplete}
+                                                style={{ width: '200px', margin: '5px' }}>
+                                                <span style={{ marginRight: '15px' }}>Update</span>
+                                                <i className="fas fa-sync-alt" />
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                onClick={this.submit}
+                                                variant="danger"
+                                                disabled={!this.isComplete}
+                                                style={{ width: '200px', margin: '5px' }}>
+                                                <span style={{ marginRight: '15px' }}>Submit</span>
+                                                <i className="fas fa-save" />
+                                            </Button> </div> : <p></p>
+
+                                }
                             </div>
                         </Form>
                     </fieldset>
