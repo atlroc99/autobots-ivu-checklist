@@ -12,6 +12,7 @@ class WelcomePacketCheckList extends Component {
         this.state = {
             checkListSubmitted: false, // hide the buttons if true
             customerId: '',
+            showCustomerId: false,
             items: [],
             showModal: false,
             modalTitle: '',
@@ -42,18 +43,25 @@ class WelcomePacketCheckList extends Component {
     async searchCustomer(customerId, event) {
         console.log('customer ID searching...:', customerId);
         const response = await axios.get(`${url}/${customerId}`)
-        const items = JSON.parse(response.data.checklistsObject)
+        
+        console.log('res', response, )
+        console.log('# keys', Object.keys(response.data).length );
 
+        if (typeof(response) === 'undefined' || Object.keys(response.data).length === 0) {
+            this.showModal({
+                modalTitle: 'Record Not Found',
+                modalBody: `No record found for customer: ${this.state.customerId}`,
+                showModal: true,
+                button1Value: 'Ok'
+            }) ;
+        }
+        
+        const items = JSON.parse(response.data.checklistsObject)
         if (items.length > 1) {
             this.setState({ customerId: customerId });
+            this.setState({ showCustomerId: true })
         }
 
-        if (items.length === 0) {
-            console.log('empty response', items)
-            this.setState({ customerId: "" });
-            event.target.reset();
-            return;
-        }
         this.setState({ items: items })
         this.setState({ checkListSubmitted: this.isSubmited(this.state.items) })
 
@@ -86,7 +94,7 @@ class WelcomePacketCheckList extends Component {
             modalTitle: `CusotmerID: ${response.data.id}`,
             modalBody: `Updated CusotmerID: ${response.data.id}`,
             button1Value: 'Ok',
-            button2Value:'',
+            button2Value: '',
             showModal: true
         });
     }
@@ -113,10 +121,12 @@ class WelcomePacketCheckList extends Component {
     }
 
     handleAcceptModalInfo = async (event) => {
-        console.log('Message Acknowledged ...subnitting form')
+        console.log('Message Acknowledged ...submitted form')
+        this.setState({ checkListSubmitted: true });
         const response = await axios.put(`${url}/${this.state.customerId}`, this.state.items);
         this.setState({ showModal: false })
         console.log('response', response);
+        window.location.reload();
     }
 
 
@@ -137,16 +147,20 @@ class WelcomePacketCheckList extends Component {
                 <form className="searchForm" onSubmit={this.lookupCustomerData}>
                     <label>Enter customer id
                         {/* <input style={{ marginLeft: '10px' }} type='text' value={this.customerId} onChange={e => setcustomerId(e.target.value)} /> */}
-                        <input className="searchFormInput" type='text' value={this.customerId} onChange={(e) => this.setState({ customerId: e.target.value })} />
+                        <input className="searchFormInput" type='text' value={this.state.customerId} onChange={(e) => this.setState({ customerId: e.target.value })} />
                     </label>
                     <Button type="submit" variant='primary' style={{ marginLeft: '50px' }}>Search</Button>
                 </form>
                 <div className="checklistBox">
                     <fieldset>
                         <Form className="p-4">
-                            <p>
-                                Update customerID: {this.state.customerId}
-                            </p>
+                            {
+                                this.state.showCustomerId ?
+                                    <p>
+                                        <span style={{ backgroundColor: 'yellow', color: 'black' }}><strong>Customer ID:</strong> {this.state.customerId}</span>
+                                    </p> : null
+                            }
+
                             <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
                             {
                                 this.state.items.map((item, idx) => {
