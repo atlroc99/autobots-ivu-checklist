@@ -1,0 +1,16 @@
+- allow to add new customer: the custoemrID/dealerID is
+pulled from the json file in s3 bucket 
+
+- dynamically display iVu / WebCtrl based on type of 
+System chosen
+
+- on Submit show modal [yes/no]
+
+
+- all checkboxes should be disabled after submit. So that when
+clients look up data by customerID the checkboxes are not
+clickable.
+
+
+
+

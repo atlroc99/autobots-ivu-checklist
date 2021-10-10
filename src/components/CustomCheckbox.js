@@ -6,6 +6,7 @@ const CustomCheckbox = (props) => {
         <Form.Check
             key={props.id}
             type="checkbox"
+            disabled={props.disableCheckBoxes}
             name={props.name}
             value={props.isChecked}
             checked={props.isChecked}

@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 
 function LiteModal({ title, body, show, handleClose, onClick, buttonValue_1, buttonValue_2 }) {
+    console.log('...opening modal')
     const isBodyEmpty = typeof body === 'undefined' 
     return (
         <div>
