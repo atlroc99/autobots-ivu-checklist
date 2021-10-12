@@ -4,7 +4,8 @@ import axios from 'axios';
 import LiteModal from './LiteModal';
 import CustomCheckbox from './CustomCheckbox'
 
-const url = 'http://localhost:8000';
+// const url = 'http://localhost:8000';
+const url = 'http://localhost:3000/checklists';
 
 class WelcomePacketCheckList extends Component {
     constructor(props) {
@@ -26,8 +27,10 @@ class WelcomePacketCheckList extends Component {
 
     isComplete = false;
     async componentDidMount() {
-        const checklist = await axios.get(url + '/checklist/items')
-        this.setState({ items: checklist.data });
+        // node: const checklist = await axios.get(url + '/checklist/items')
+        // node: this.setState({ items: paresed_checklist.data });
+        const response = await axios.get(url + '/dealer-checklist')
+        this.setState({ items: response.data.results.checklist });
     }
 
     showModal(modalAttr) {
@@ -45,7 +48,7 @@ class WelcomePacketCheckList extends Component {
         const response = await axios.get(`${url}/${customerId}`)
         
         console.log('res', response, )
-        console.log('# keys', Object.keys(response.data).length );
+        console.log('# keys', Object.keys(response.data.dealersChecklist).length );
 
         if (typeof(response) === 'undefined' || Object.keys(response.data).length === 0) {
             this.showModal({
@@ -56,7 +59,7 @@ class WelcomePacketCheckList extends Component {
             }) ;
         }
         
-        const items = JSON.parse(response.data.checklistsObject)
+        const items = response.data.dealersChecklist;
         if (items.length > 1) {
             this.setState({ customerId: customerId });
             this.setState({ showCustomerId: true })
