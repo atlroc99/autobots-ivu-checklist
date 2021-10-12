@@ -6,6 +6,7 @@ System chosen
 
 - on Submit show modal [yes/no]
 
+- after submitted the form show data with disabled checklist
 
 - all checkboxes should be disabled after submit. So that when
 clients look up data by customerID the checkboxes are not

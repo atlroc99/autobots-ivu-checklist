@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button, Form, Modal, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import LiteModal from './LiteModal';
-import CustomCheckbox from './CustomCheckbox'
+import CustomCheckbox from './CustomCheckbox';
+import ButtonTest from "./ButtonTest";
 
 // const url = 'http://localhost:8000';
 const url = 'http://localhost:3000/checklists';
@@ -12,20 +13,23 @@ class WelcomePacketCheckList extends Component {
         super(props);
         this.state = {
             checkListSubmitted: false, // hide the buttons if true
-            customerId: '',
-            showCustomerId: false,
+            dealershipName: '',
+            showdealershipName: false,
             items: [],
             showModal: false,
+            isComplete: false,
+            isUpdating: false,
+            isSubmitting: false,
             modalTitle: '',
             modalBody: '',
             disableCheckBoxes: false,
             isUpdaing: false,
             buttonValue_1: '',
-            buttonValue_2: ''
+            buttonValue_2: '',
         };
     }
 
-    isComplete = false;
+    // isComplete = false;
     async componentDidMount() {
         // node: const checklist = await axios.get(url + '/checklist/items')
         // node: this.setState({ items: paresed_checklist.data });
@@ -43,29 +47,29 @@ class WelcomePacketCheckList extends Component {
         this.setState({ showModal: showModal });
     }
 
-    async searchCustomer(customerId, event) {
-        console.log('customer ID searching...:', customerId);
-        const response = await axios.get(`${url}/${customerId}`)
-        
-        console.log('res', response, )
-        console.log('# keys', Object.keys(response.data.dealersChecklist).length );
+    async searchCustomer(dealershipName, event) {
+        console.log('customer ID searching...:', dealershipName);
+        const response = await axios.get(`${url}/dealership/${dealershipName}`)
+        console.log('res', response,)
 
-        if (typeof(response) === 'undefined' || Object.keys(response.data).length === 0) {
+        const dealersChecklist = response.data.results.dealersChecklist
+        console.log('# keys', Object.keys(dealersChecklist).length);
+
+        if (typeof (dealersChecklist) === 'undefined' || Object.keys(dealersChecklist).length === 0) {
             this.showModal({
                 modalTitle: 'Record Not Found',
-                modalBody: `No record found for customer: ${this.state.customerId}`,
+                modalBody: `No record found for customer: ${this.state.dealershipName}`,
                 showModal: true,
                 button1Value: 'Ok'
-            }) ;
-        }
-        
-        const items = response.data.dealersChecklist;
-        if (items.length > 1) {
-            this.setState({ customerId: customerId });
-            this.setState({ showCustomerId: true })
+            });
         }
 
-        this.setState({ items: items })
+        if (dealersChecklist.length > 1) {
+            this.setState({ dealershipName: dealershipName });
+            this.setState({ showdealershipName: true })
+        }
+
+        this.setState({ items: dealersChecklist })
         this.setState({ checkListSubmitted: this.isSubmited(this.state.items) })
 
         // disable checklist if forms already submitted before
@@ -86,13 +90,19 @@ class WelcomePacketCheckList extends Component {
             }
         });
         this.setState({ items: items });
-        this.isComplete = this.state.items.every(i => i.isChecked === true);
+        // this.isComplete = this.state.items.every(i => i.isChecked === true);
+        console.log('all checked: ', this.state.items.every(i => i.isChecked === true));
+        this.setState({ isComplete: this.state.items.every(i => i.isChecked === true) })
     }
 
     update = async (e) => {
         e.preventDefault();
-        const customerId = this.state.customerId ? this.state.customerId : 'NIL';
-        const response = await axios.put(`${url}/${customerId}`, this.state.items);
+        const dealershipName = this.state.dealershipName ? this.state.dealershipName : 'NIL';
+        const body = JSON.stringify({ "dealersChecklist": this.state.items });
+        console.log('updating: ', body);
+        this.setState({ isUpdaing: true })
+        const response = await axios.put(`${url}/${dealershipName}`, body);
+        console.log('response,', response.data)
         this.showModal({
             modalTitle: `CusotmerID: ${response.data.id}`,
             modalBody: `Updated CusotmerID: ${response.data.id}`,
@@ -102,18 +112,17 @@ class WelcomePacketCheckList extends Component {
         });
     }
 
-
     submit = async (e) => {
         e.preventDefault();
-        console.log('submtting data for: ', this.state.customerId);
+        console.log('submtting data for: ', this.state.dealershipName);
+        this.setState({ isSubmitting: true });
         this.showModal({
-            modalTitle: `'Submitting data for ${this.state.customerId}`,
+            modalTitle: `'Submitting data for ${this.state.dealershipName}`,
             modalBody: 'Are you sure? Once Submitted, you will not be able to update the data',
             showModal: true,
             button1Value: 'Yes',
             button2Value: 'No',
-        }
-        )
+        })
     }
 
     handleCloseModal = () => {
@@ -123,20 +132,26 @@ class WelcomePacketCheckList extends Component {
         this.setState({ modalBody: '' });
     }
 
-    handleAcceptModalInfo = async (event) => {
+    handleAcceptDataSubmission = async (event) => {
         console.log('Message Acknowledged ...submitted form')
         this.setState({ checkListSubmitted: true });
-        const response = await axios.put(`${url}/${this.state.customerId}`, this.state.items);
+        console.log('submitting data: ', this.state.items);
+        const requestBody = JSON.stringify({
+            'dealershipName': this.state.dealershipName,
+            'dealersChecklist': this.state.items
+        });
+        const response = await axios.post(`${url}/${this.state.dealershipName}/submit`, requestBody);
         this.setState({ showModal: false })
         console.log('response', response);
-        window.location.reload();
-    }
+        this.setState({disableCheckBoxes: true});
 
+        // window.location.reload();
+    }
 
     lookupCustomerData = (event) => {
         event.preventDefault();
-        console.log('value: ', this.state.customerId);
-        const response = this.searchCustomer(this.state.customerId, event)
+        console.log('value: ', this.state.dealershipName);
+        const response = this.searchCustomer(this.state.dealershipName, event)
         event.preventDefault();
     }
 
@@ -149,8 +164,8 @@ class WelcomePacketCheckList extends Component {
                 <h5>Class Component</h5>
                 <form className="searchForm" onSubmit={this.lookupCustomerData}>
                     <label>Enter customer id
-                        {/* <input style={{ marginLeft: '10px' }} type='text' value={this.customerId} onChange={e => setcustomerId(e.target.value)} /> */}
-                        <input className="searchFormInput" type='text' value={this.state.customerId} onChange={(e) => this.setState({ customerId: e.target.value })} />
+                        {/* <input style={{ marginLeft: '10px' }} type='text' value={this.dealershipName} onChange={e => setdealershipName(e.target.value)} /> */}
+                        <input className="searchFormInput" type='text' value={this.state.dealershipName} onChange={(e) => this.setState({ dealershipName: e.target.value })} />
                     </label>
                     <Button type="submit" variant='primary' style={{ marginLeft: '50px' }}>Search</Button>
                 </form>
@@ -158,9 +173,10 @@ class WelcomePacketCheckList extends Component {
                     <fieldset>
                         <Form className="p-4">
                             {
-                                this.state.showCustomerId ?
+                                this.state.showdealershipName ?
+                                // style={{ backgroundColor: 'yellow', color: 'black' }}
                                     <p>
-                                        <span style={{ backgroundColor: 'yellow', color: 'black' }}><strong>Customer ID:</strong> {this.state.customerId}</span>
+                                        <span><strong>Customer ID:</strong> {this.state.dealershipName}</span>
                                     </p> : null
                             }
 
@@ -182,33 +198,31 @@ class WelcomePacketCheckList extends Component {
                                                 value='Update'
                                                 onClick={this.update}
                                                 variant="outline-primary"
-                                                disabled={this.isComplete}
+                                                disabled={this.state.isComplete}
                                                 style={{ width: '200px', margin: '5px' }}>
-                                                <span style={{ marginRight: '15px' }}>Update</span>
-                                                <i className="fas fa-sync-alt" />
+                                                    <span style={{ marginRight: '15px' }}>Update</span>
+                                                    <i className="fas fa-sync-alt" />
                                             </Button>
-                                            <Button
-                                                type="submit"
+                                            <Button type="submit"
                                                 onClick={this.submit}
                                                 variant="danger"
-                                                disabled={!this.isComplete}
+                                                disabled={!this.state.isComplete}
                                                 style={{ width: '200px', margin: '5px' }}>
-                                                <span style={{ marginRight: '15px' }}>Submit</span>
-                                                <i className="fas fa-save" />
+                                                    <span style={{ marginRight: '15px' }}>Submit</span>
+                                                    <i className="fas fa-sync-alt" />
                                             </Button>
+
                                             <LiteModal
                                                 title={this.state.modalTitle}
                                                 body={this.state.modalBody}
                                                 show={this.state.showModal}
                                                 handleClose={this.handleCloseModal}
-                                                onClick={this.handleAcceptModalInfo}
+                                                onClick={this.state.isUpdaing ? this.handleCloseModal : this.handleAcceptDataSubmission}
                                                 buttonValue_1={this.state.buttonValue_1}
                                                 buttonValue_2={this.state.buttonValue_2}
                                             />
-
                                         </div> : <p></p>
                                 }
-                                {console.log('isModealshow:', this.state.showModal)}
                             </div>
                         </Form>
                     </fieldset>
