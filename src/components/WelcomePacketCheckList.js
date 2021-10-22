@@ -235,20 +235,22 @@ class WelcomePacketCheckList extends Component {
                                 this.state.dealer.checklists.map((item, idx) => {
                                     return (
                                         <Form.Group key={idx}>
-                                            <CustomCheckbox onChange={this.handleChange} disableCheckBoxes={this.state.disableCheckBoxes} {...item} />
+                                            {/* <CustomCheckbox onChange={this.handleChange} disableCheckBoxes={this.state.disableCheckBoxes} {...item} /> */}
+                                            <CustomCheckbox onChange={this.handleChange} disableCheckBoxes={this.state.dealer.isCompleted} {...item} />
                                         </Form.Group>
                                     )
                                 })
                             }
                             <div>
                                 {
-                                    !this.state.checkListSubmitted ?
+                                    // !this.state.checkListSubmitted ?
+                                    !this.state.dealer.isCompleted ?
                                         <div style={{ marginLeft: '40%' }}>
                                             <Button type="submit"
                                                 value='Update'
                                                 onClick={this.update}
                                                 variant="outline-primary"
-                                                disabled={this.state.isComplete}
+                                                disabled={this.state.dealer.isCompleted}
                                                 style={{ width: '200px', margin: '5px' }}>
                                                 <span style={{ marginRight: '15px' }}>Update</span>
                                                 <i className="fas fa-sync-alt" />
@@ -256,7 +258,7 @@ class WelcomePacketCheckList extends Component {
                                             <Button type="submit"
                                                 onClick={this.submit}
                                                 variant="danger"
-                                                disabled={!this.state.isComplete}
+                                                disabled={!this.state.dealer.isCompleted}
                                                 style={{ width: '200px', margin: '5px' }}>
                                                 <span style={{ marginRight: '15px' }}>Submit</span>
                                                 <i className="fas fa-sync-alt" />
