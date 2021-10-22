@@ -182,7 +182,7 @@ class WelcomePacketCheckList extends Component {
         console.log('response', response);
         this.setState({ disableCheckBoxes: true });
 
-        // window.location.reload();
+        window.location.reload();
     }
 
     lookupCustomerData = (event) => {
@@ -250,7 +250,7 @@ class WelcomePacketCheckList extends Component {
                                                 value='Update'
                                                 onClick={this.update}
                                                 variant="outline-primary"
-                                                disabled={this.state.dealer.isCompleted}
+                                                disabled={this.state.isComplete}
                                                 style={{ width: '200px', margin: '5px' }}>
                                                 <span style={{ marginRight: '15px' }}>Update</span>
                                                 <i className="fas fa-sync-alt" />
@@ -258,7 +258,7 @@ class WelcomePacketCheckList extends Component {
                                             <Button type="submit"
                                                 onClick={this.submit}
                                                 variant="danger"
-                                                disabled={!this.state.dealer.isCompleted}
+                                                disabled={!this.state.isComplete}
                                                 style={{ width: '200px', margin: '5px' }}>
                                                 <span style={{ marginRight: '15px' }}>Submit</span>
                                                 <i className="fas fa-sync-alt" />
