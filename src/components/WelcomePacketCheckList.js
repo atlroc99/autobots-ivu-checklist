@@ -1,10 +1,8 @@
 import React, { Component } from "react";
-import { Button, Form, Modal, Spinner } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 import LiteModal from './LiteModal';
 import CustomCheckbox from './CustomCheckbox';
-import ButtonTest from "./ButtonTest";
-import { useParams } from "react-router";
 
 // const url = 'http://localhost:8000';
 const url = 'http://localhost:3000/checklists';
@@ -49,8 +47,8 @@ class WelcomePacketCheckList extends Component {
         const response = await axios.get(url + `/${this.props.match.params.dealership}`);
         console.log('response', response)
         // const { data } = JSON.parse(response.data);
-        const dealer= {...response.data}
-        this.setState({dealer})
+        const dealer = { ...response.data }
+        this.setState({ dealer })
         console.log(this.state.dealer)
     }
 
@@ -110,10 +108,7 @@ class WelcomePacketCheckList extends Component {
 
         const dealer = this.state.dealer
         dealer.checklists = items
-        this.setState({dealer})
-        // this.setState({ items: items });
-        // this.isComplete = this.state.items.every(i => i.isChecked === true);
-        // console.log('all checked: ', this.state.items.every(i => i.isChecked === true));
+        this.setState({ dealer })
         this.setState({ isComplete: this.state.items.every(i => i.isChecked === true) })
 
         console.log('all checked: ', this.state.dealer.checklists.every(i => i.isChecked === true));
@@ -122,13 +117,12 @@ class WelcomePacketCheckList extends Component {
 
     update = async (e) => {
         e.preventDefault();
-        const dealershipName = this.state.dealer.dealerName ? this.state.dealer.dealerName  : 'NIL';
-        
-        // const body = JSON.stringify({ "dealersChecklist": this.state.items });
+        const dealershipName = this.state.dealer.dealerName ? this.state.dealer.dealerName : 'NIL';
+
         const payload = JSON.stringify(this.state.dealer);
         this.setState({ isUpdaing: true })
-        console.log('SEND TO BACKEND: ', payload )
-        
+        console.log('SEND TO BACKEND: ', payload)
+
         const response = await axios.put(`${url}/${dealershipName}?update=true`, payload);
         console.log('response,', response.data)
         const str_val = JSON.stringify(response.data);
@@ -169,11 +163,6 @@ class WelcomePacketCheckList extends Component {
         console.log('Message Acknowledged ...submitted form')
         this.setState({ checkListSubmitted: true });
         console.log('submitting data: ', this.state.dealer);
-        // const requestBody = JSON.stringify({
-        //     'dealershipName': this.state.dealershipName,
-        //     'dealersChecklist': this.state.items
-        // });
-        // const response = await axios.post(`${url}/${this.state.dealershipName}/submit`, requestBody);
         const requestBody = JSON.stringify(this.state.dealer)
         const post_url = `${url}/${this.state.dealer.dealerName}?submit=${true}`;
         console.log('submitting to url: ', post_url)
@@ -181,7 +170,6 @@ class WelcomePacketCheckList extends Component {
         this.setState({ showModal: false })
         console.log('response', response);
         this.setState({ disableCheckBoxes: true });
-
         window.location.reload();
     }
 
@@ -208,12 +196,12 @@ class WelcomePacketCheckList extends Component {
                     </div>
                 </div>
                 <hr />
-                
+
                 <form className="searchForm" onSubmit={this.lookupCustomerData}>
                     {/* <label>Enter customer id */}
-                        {/* <input style={{ marginLeft: '10px' }} type='text' value={this.dealershipName} onChange={e => setdealershipName(e.target.value)} /> */}
-                        {/* <input className="searchFormInput" type='text' value={this.state.dealer.dealerName} onChange={(e) => this.setState({ dealershipName: e.target.value })} /> */}
-                        {/* <input className="searchFormInput" type='text' value={this.state.dealer.dealerName} onChange={(e) => this.setState({ dealerName: e.target.value })} /> */}
+                    {/* <input style={{ marginLeft: '10px' }} type='text' value={this.dealershipName} onChange={e => setdealershipName(e.target.value)} /> */}
+                    {/* <input className="searchFormInput" type='text' value={this.state.dealer.dealerName} onChange={(e) => this.setState({ dealershipName: e.target.value })} /> */}
+                    {/* <input className="searchFormInput" type='text' value={this.state.dealer.dealerName} onChange={(e) => this.setState({ dealerName: e.target.value })} /> */}
                     {/* </label> */}
                     {/* <Button type="submit" variant='primary' style={{ marginLeft: '50px' }}>Search</Button> */}
                 </form>
@@ -231,11 +219,9 @@ class WelcomePacketCheckList extends Component {
 
                             <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
                             {
-                                // this.state.items.map((item, idx) => {
                                 this.state.dealer.checklists.map((item, idx) => {
                                     return (
                                         <Form.Group key={idx}>
-                                            {/* <CustomCheckbox onChange={this.handleChange} disableCheckBoxes={this.state.disableCheckBoxes} {...item} /> */}
                                             <CustomCheckbox onChange={this.handleChange} disableCheckBoxes={this.state.dealer.isCompleted} {...item} />
                                         </Form.Group>
                                     )
