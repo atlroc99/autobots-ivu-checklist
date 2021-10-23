@@ -3,12 +3,13 @@ import { Button } from 'react-bootstrap';
 
 const AdminButton = (props) => {
     console.log("inside admin button: isAdmin: ", props.isAdmin)
+    console.log("PROPS: ", props)
     return (
         <div>
             <div className="row">
                 <div className="col col-md">
                     <Button type="submit"
-                        onClick='this.cance;'
+                        onClick={props.cancelChanges}
                         variant="primary"
                         // disabled={!this.state.isComplete}
                         style={{ width: '200px', margin: '5px' }}>
@@ -18,7 +19,7 @@ const AdminButton = (props) => {
                 </div>
                 <div className="col col-md">
                     <Button type="submit"
-                        onClick='this.save'
+                        onClick={props.saveChanges}
                         variant="danger"
                         // disabled={!this.state.isComplete}
                         style={{ width: '200px', margin: '5px' }}>

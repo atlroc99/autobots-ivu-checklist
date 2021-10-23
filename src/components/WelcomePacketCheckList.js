@@ -13,7 +13,7 @@ class WelcomePacketCheckList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isAdmin: false,
+            isAdmin: true,
             dealer: {
                 checklists: [],
                 dealerName: '',
@@ -24,6 +24,8 @@ class WelcomePacketCheckList extends Component {
                 systemName: '',
                 uiTheme: ''
             },
+
+            tempCheckListItems: [],
 
             checkListSubmitted: false, // hide the buttons if true
             dealershipName: '',
@@ -39,6 +41,7 @@ class WelcomePacketCheckList extends Component {
             isUpdating: false,
             buttonValue_1: '',
             buttonValue_2: '',
+            refresh: false,
         };
         // console.log('Inside WelcomePacket Constructor')
     }
@@ -190,17 +193,55 @@ class WelcomePacketCheckList extends Component {
         return data.every(item => item.isChecked === true);
     }
 
-    handleOnChangeLable(newLabel, labelId) {
-        console.log(newLabel);
-        const dealer = this.state.dealer
-        for (let item in dealer.checklists) {
-            if (item.id == labelId) {
-                item.label = newLabel
-            }
-        }
-        this.setState({ dealer });
+    handleOnChangeLabel = (value, itemName, itemId) => {
+        console.log('value: ', value);
+        console.log('itemName', itemName);
+        console.log('itemId', itemId);
+        const tempCheckListItems = this.state.tempCheckListItems
+        // handle duplicate
+        tempCheckListItems.push({
+            "id": itemId,
+            "name": itemName,
+            "lable": value,
+        });
+        this.setState({ tempCheckListItems })
+        console.log('TEMP CHECKLIST ITEMS: ', this.state.tempCheckListItems);
+
+        // const dealer = this.state.dealer
+        // for (let item in dealer.checklists) {
+        // console.log('item')
+        // if (item.id == labelId) {
+        //     item.label = newLabel
+        // }
+        // }
+        // this.setState({ dealer });
     }
 
+    adminCancelChanges = (event) => {
+        event.preventDefault();
+        console.log('Admin cancel changes: ', event.target);
+        //needs to be set to original state
+        const dealer = this.state.dealer;
+        const checklists = dealer.checklists;
+        this.setState({tempCheckListItems: []})
+        this.print(this.state.tempCheckListItems)
+        this.setState({...dealer})
+
+    }
+
+    adminSaveChanges = (event) => {
+        event.preventDefault();
+        this.print('Admin SAVING changes: ', event.target);
+
+        //needs to update the state of  dealer checklist lable 
+        const dealer = this.state.dealer;
+        const checklists = dealer.checklists;
+        
+    }
+
+    print(val) {
+        console.log(val);
+    }
 
     render() {
         return (
@@ -230,7 +271,7 @@ class WelcomePacketCheckList extends Component {
                                                 dealer={this.state.dealer}
                                                 isAdmin={this.state.isAdmin}
                                                 onChange={this.handleChange}
-                                                handleOnChangeLable={this.handleOnChangeLable}
+                                                handleOnChangeLabel={this.handleOnChangeLabel}
                                                 disableCheckBoxes={this.state.dealer.isCompleted}
                                                 {...item} />
                                         </Form.Group>
@@ -244,9 +285,11 @@ class WelcomePacketCheckList extends Component {
                                         submit={this.submit}
                                         isAdmin={this.state.isAdmin}
                                         isAllChecked={this.state.isComplete} />
-                                    : this.state.isAdmin ? <AdminButton isAdmin={this.state.isAdmin} />
+                                    : this.state.isAdmin ? <AdminButton
+                                        isAdmin={this.state.isAdmin}
+                                        cancelChanges={this.adminCancelChanges}
+                                        saveChanges={this.adminSaveChanges} />
                                         : null
-
                             }
                             <LiteModal
                                 title={this.state.modalTitle}
