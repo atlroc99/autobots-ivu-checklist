@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import axios from 'axios';
 import LiteModal from './LiteModal';
 import CustomCheckbox from './CustomCheckbox';
+import AdminButton from "./AdminButton";
+import UserButton from "./UserButton";
 
 // const url = 'http://localhost:8000';
 const url = 'http://localhost:3000/checklists';
@@ -11,6 +13,7 @@ class WelcomePacketCheckList extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isAdmin: false,
             dealer: {
                 checklists: [],
                 dealerName: '',
@@ -29,27 +32,29 @@ class WelcomePacketCheckList extends Component {
             isComplete: false,
             showdealershipName: false,
             showModal: false,
-            isUpdating: false,
             isSubmitting: false,
             modalTitle: '',
             modalBody: '',
             disableCheckBoxes: false,
-            isUpdaing: false,
+            isUpdating: false,
             buttonValue_1: '',
             buttonValue_2: '',
         };
+        // console.log('Inside WelcomePacket Constructor')
     }
 
 
 
     // isComplete = false;
     async componentDidMount() {
+        console.log('in componentDidMount')
         const response = await axios.get(url + `/${this.props.match.params.dealership}`);
         console.log('response', response)
         // const { data } = JSON.parse(response.data);
         const dealer = { ...response.data }
         this.setState({ dealer })
         console.log(this.state.dealer)
+        // this.setState({ isAdmin: true })
     }
 
     showModal(modalAttr) {
@@ -98,6 +103,7 @@ class WelcomePacketCheckList extends Component {
 
     handleChange = (event) => {
         // let items = this.state.items;
+        console.log('handling click checkbox')
         let items = this.state.dealer.checklists;
 
         items.forEach(item => {
@@ -120,7 +126,7 @@ class WelcomePacketCheckList extends Component {
         const dealershipName = this.state.dealer.dealerName ? this.state.dealer.dealerName : 'NIL';
 
         const payload = JSON.stringify(this.state.dealer);
-        this.setState({ isUpdaing: true })
+        this.setState({ isUpdating: true })
         console.log('SEND TO BACKEND: ', payload)
 
         const response = await axios.put(`${url}/${dealershipName}?update=true`, payload);
@@ -183,6 +189,19 @@ class WelcomePacketCheckList extends Component {
     isSubmited(data) {
         return data.every(item => item.isChecked === true);
     }
+
+    handleOnChangeLable(newLabel, labelId) {
+        console.log(newLabel);
+        const dealer = this.state.dealer
+        for (let item in dealer.checklists) {
+            if (item.id == labelId) {
+                item.label = newLabel
+            }
+        }
+        this.setState({ dealer });
+    }
+
+
     render() {
         return (
             <div>
@@ -190,78 +209,54 @@ class WelcomePacketCheckList extends Component {
                     <div className="col col-6">
                         <h2>Welcome Packet checklist</h2>
                         <h5>{this.state.dealer.dealerName}</h5>
+                        <hr />
+                        <h6>Logged in As Admin: {this.state.isAdmin ? 'True' : 'False'}</h6>
+                        <h6>dealer submitted / completed form: {this.state.dealer.isCompleted ? 'True' : 'False'}</h6>
                     </div>
                     <div className="col col-6">
                         <h5 style={{ float: 'right', marginTop: '20px', marginRight: '70px' }}>{this.state.dealer.endCustomerCompany}</h5>
                     </div>
                 </div>
                 <hr />
-
-                <form className="searchForm" onSubmit={this.lookupCustomerData}>
-                    {/* <label>Enter customer id */}
-                    {/* <input style={{ marginLeft: '10px' }} type='text' value={this.dealershipName} onChange={e => setdealershipName(e.target.value)} /> */}
-                    {/* <input className="searchFormInput" type='text' value={this.state.dealer.dealerName} onChange={(e) => this.setState({ dealershipName: e.target.value })} /> */}
-                    {/* <input className="searchFormInput" type='text' value={this.state.dealer.dealerName} onChange={(e) => this.setState({ dealerName: e.target.value })} /> */}
-                    {/* </label> */}
-                    {/* <Button type="submit" variant='primary' style={{ marginLeft: '50px' }}>Search</Button> */}
-                </form>
-
                 <div className="checklistBox">
                     <fieldset>
                         <Form className="p-4">
-                            {
-                                this.state.showdealershipName ?
-                                    // style={{ backgroundColor: 'yellow', color: 'black' }}
-                                    <p>
-                                        <span><strong>Customer ID:</strong> {this.state.dealer.dealerName}</span>
-                                    </p> : null
-                            }
-
                             <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
-                            {
+                            {// render checklist
                                 this.state.dealer.checklists.map((item, idx) => {
                                     return (
                                         <Form.Group key={idx}>
-                                            <CustomCheckbox onChange={this.handleChange} disableCheckBoxes={this.state.dealer.isCompleted} {...item} />
+                                            <CustomCheckbox
+                                                dealer={this.state.dealer}
+                                                isAdmin={this.state.isAdmin}
+                                                onChange={this.handleChange}
+                                                handleOnChangeLable={this.handleOnChangeLable}
+                                                disableCheckBoxes={this.state.dealer.isCompleted}
+                                                {...item} />
                                         </Form.Group>
                                     )
                                 })
                             }
-                            <div>
-                                {
-                                    // !this.state.checkListSubmitted ?
-                                    !this.state.dealer.isCompleted ?
-                                        <div style={{ marginLeft: '40%' }}>
-                                            <Button type="submit"
-                                                value='Update'
-                                                onClick={this.update}
-                                                variant="outline-primary"
-                                                disabled={this.state.isComplete}
-                                                style={{ width: '200px', margin: '5px' }}>
-                                                <span style={{ marginRight: '15px' }}>Update</span>
-                                                <i className="fas fa-sync-alt" />
-                                            </Button>
-                                            <Button type="submit"
-                                                onClick={this.submit}
-                                                variant="danger"
-                                                disabled={!this.state.isComplete}
-                                                style={{ width: '200px', margin: '5px' }}>
-                                                <span style={{ marginRight: '15px' }}>Submit</span>
-                                                <i className="fas fa-sync-alt" />
-                                            </Button>
+                            {
+                                !this.state.isAdmin && !this.state.dealer.isCompleted ?
+                                    <UserButton
+                                        update={this.update}
+                                        submit={this.submit}
+                                        isAdmin={this.state.isAdmin}
+                                        isAllChecked={this.state.isComplete} />
+                                    : this.state.isAdmin ? <AdminButton isAdmin={this.state.isAdmin} />
+                                        : null
 
-                                            <LiteModal
-                                                title={this.state.modalTitle}
-                                                body={this.state.modalBody}
-                                                show={this.state.showModal}
-                                                handleClose={this.handleCloseModal}
-                                                onClick={this.state.isUpdaing ? this.handleCloseModal : this.handleAcceptDataSubmission}
-                                                buttonValue_1={this.state.buttonValue_1}
-                                                buttonValue_2={this.state.buttonValue_2}
-                                            />
-                                        </div> : <p></p>
-                                }
-                            </div>
+                            }
+                            <LiteModal
+                                title={this.state.modalTitle}
+                                body={this.state.modalBody}
+                                show={this.state.showModal}
+                                handleClose={this.handleCloseModal}
+                                onClick={this.state.isUpdating ? this.handleCloseModal : this.handleAcceptDataSubmission}
+                                buttonValue_1={this.state.buttonValue_1}
+                                buttonValue_2={this.state.buttonValue_2}
+                            />
                         </Form>
                     </fieldset>
                 </div>

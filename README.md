@@ -1,3 +1,15 @@
+### US26483: Welcome Packet Checklist Form - WebCTRL Checklist
+#### Acceptance Criteria:
+- WebCTRL Checklist will be editable by Customer success
+- Set up so that from an Admin type panel items can be added or deleted and the checklist will scale
+- Checklist must be responsive with the rest of the form based on screen 
+- Checkbox to the left of the checklist item
+- Checkbox should align to the left margin with the Welcome Packet Checklist Banner
+- Title of the line - to be bold (set at X number of characters)
+- Quick Description - to be after the title (set at X number of characters)
+- Input Dummy Title and Text for 18 checklist items
+- User can check and un-check a box for any of their items as long as the form as not been submitted
+
 # FrontEnd for the Welcome packet checklist with sam and node-redis
 
 # Getting Started with Create React App
