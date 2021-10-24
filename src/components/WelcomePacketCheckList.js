@@ -214,10 +214,11 @@ class WelcomePacketCheckList extends Component {
         console.log('TEMP CHECKLIST ITEMS: ', this.state.tempCheckListItems);
     }
 
-    adminCancelChanges = (event) => {
-        event.preventDefault();
-        console.log('Admin cancel changes: ');
-    }
+    // adminCancelChanges = (event) => {
+    //     event.preventDefault();
+    //     console.log('Admin cancel changes: ');
+    //     this.reload()
+    // }
 
     adminSaveChanges = (event) => {
         event.preventDefault();
@@ -247,6 +248,8 @@ class WelcomePacketCheckList extends Component {
 
         console.log('*** TEMP CHECK LIST')
         console.log(this.state.tempCheckListItems)
+
+        this.update(event);
     }
 
     print(val) {
@@ -293,6 +296,10 @@ class WelcomePacketCheckList extends Component {
         }
     }
 
+    reload = () => {
+        window.location.reload(false);
+    }
+
     render() {
         return (
             <div>
@@ -337,7 +344,7 @@ class WelcomePacketCheckList extends Component {
                                         isAllChecked={this.state.isComplete} />
                                     : this.state.isAdmin ? <AdminButton
                                         isAdmin={this.state.isAdmin}
-                                        cancelChanges={this.adminCancelChanges}
+                                        cancelChanges={()=> window.location.reload(false)}
                                         saveChanges={this.adminSaveChanges} />
                                         : null
                             }
