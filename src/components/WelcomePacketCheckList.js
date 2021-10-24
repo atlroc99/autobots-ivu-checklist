@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form } from 'react-bootstrap';
+import { Form, Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 import LiteModal from './LiteModal';
 import CustomCheckbox from './CustomCheckbox';
@@ -42,6 +42,11 @@ class WelcomePacketCheckList extends Component {
             buttonValue_1: '',
             buttonValue_2: '',
             refresh: false,
+
+            // custom label for checklist
+            isShowAddLabelModal: false,
+            disableLabelAddButton: false,
+            customLabel: '',
         };
         // console.log('Inside WelcomePacket Constructor')
     }
@@ -182,12 +187,12 @@ class WelcomePacketCheckList extends Component {
         window.location.reload();
     }
 
-    lookupCustomerData = (event) => {
-        event.preventDefault();
-        console.log('value: ', this.state.dealershipName);
-        const response = this.searchCustomer(this.state.dealershipName, event)
-        event.preventDefault();
-    }
+    // lookupCustomerData = (event) => {
+    //     event.preventDefault();
+    //     console.log('value: ', this.state.dealershipName);
+    //     const response = this.searchCustomer(this.state.dealershipName, event)
+    //     event.preventDefault();
+    // }
 
     isSubmited(data) {
         return data.every(item => item.isChecked === true);
@@ -198,35 +203,20 @@ class WelcomePacketCheckList extends Component {
         console.log('itemName', itemName);
         console.log('itemId', itemId);
         const tempCheckListItems = this.state.tempCheckListItems
+
         // handle duplicate
         tempCheckListItems.push({
             "id": itemId,
             "name": itemName,
-            "lable": value,
+            "label": value,
         });
         this.setState({ tempCheckListItems })
         console.log('TEMP CHECKLIST ITEMS: ', this.state.tempCheckListItems);
-
-        // const dealer = this.state.dealer
-        // for (let item in dealer.checklists) {
-        // console.log('item')
-        // if (item.id == labelId) {
-        //     item.label = newLabel
-        // }
-        // }
-        // this.setState({ dealer });
     }
 
     adminCancelChanges = (event) => {
         event.preventDefault();
-        console.log('Admin cancel changes: ', event.target);
-        //needs to be set to original state
-        const dealer = this.state.dealer;
-        const checklists = dealer.checklists;
-        this.setState({tempCheckListItems: []})
-        this.print(this.state.tempCheckListItems)
-        this.setState({...dealer})
-
+        console.log('Admin cancel changes: ');
     }
 
     adminSaveChanges = (event) => {
@@ -235,12 +225,72 @@ class WelcomePacketCheckList extends Component {
 
         //needs to update the state of  dealer checklist lable 
         const dealer = this.state.dealer;
-        const checklists = dealer.checklists;
-        
+        const dealerChecklist = dealer.checklists;
+        let tempCheckListItems = this.state.tempCheckListItems;
+
+        dealerChecklist.forEach(dealerItem => {
+            tempCheckListItems.forEach(tempItem => {
+                if (dealerItem.name.trim() === tempItem.name.trim()) {
+                    dealerItem['label'] = tempItem.label;
+                }
+            });
+        });
+
+        tempCheckListItems = []
+        this.setState({ dealer })
+        this.setState({ tempCheckListItems })
+
+        this.print('Finally, ')
+
+        console.log('UPDATED DEALER CHECKLIST ')
+        console.log(this.state.dealer)
+
+        console.log('*** TEMP CHECK LIST')
+        console.log(this.state.tempCheckListItems)
     }
 
     print(val) {
         console.log(val);
+    }
+
+
+    openAddLabelModal = () => {
+        console.log('adding stuff to the list');
+        this.setState({ isShowAddLabelModal: true });
+    }
+
+    addLabel = (e) => {
+        const label = document.getElementById('cbx-label').value;
+        console.log('target.value', label);
+        const dealer = this.state.dealer
+        const checklists = dealer.checklists
+        const id = checklists.length + 1;
+
+        if (!label) {
+            return;
+        }
+
+        const item = {
+            'id': id,
+            'name': 'userDefinedLabel_' + id,
+            'label': label,
+            'isChecked': false
+        }
+
+        checklists.push(item);
+        this.setState({ dealer });
+
+        this.setState({ isShowAddLabelModal: false });
+    }
+
+    manageAddLabel = (e) => {
+        const labelChar = e.target.value;
+        console.log('text-area value: ', labelChar);
+        const disable = labelChar.length > 255 ? true : false;
+        this.setState({ disableLabelAddButton: disable })
+        if (disable) {
+            alert('Exceeded Max character count (256)');
+        }
     }
 
     render() {
@@ -302,6 +352,32 @@ class WelcomePacketCheckList extends Component {
                             />
                         </Form>
                     </fieldset>
+                    {
+                        this.state.isAdmin ?
+                            <div className="addLabelModal">
+                                <Button variant="primary" onClick={this.openAddLabelModal}>Add an Item</Button>
+                                <Modal show={this.state.isShowAddLabelModal} onHide={this.handleCloseModal}>
+                                    <Modal.Header>Modal Heading</Modal.Header>
+                                    <Modal.Body>
+                                        <label for="cbx-label">Enter new Item below</label>
+                                        <textarea
+                                            id="cbx-label"
+                                            name="cbx-label"
+                                            row="10" cols="50"
+                                            minLength="5" maxLength="256"
+                                            defaultValue={this.state.customLabel}
+                                            placeholder="Max 256 characters"
+                                            onChange={this.manageAddLabel}>
+                                        </textarea>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant='primary' onClick={(e) => { this.setState({ isShowAddLabelModal: false }) }}>Cancel</Button>
+                                        <Button variant='primary' disabled={this.state.disableLabelAddButton} onClick={this.addLabel}>Add</Button>
+                                    </Modal.Footer>
+                                </Modal>
+                            </div>
+                            : null
+                    }
                 </div>
             </div>
         )
