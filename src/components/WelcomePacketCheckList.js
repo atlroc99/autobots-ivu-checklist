@@ -28,9 +28,9 @@ class WelcomePacketCheckList extends Component {
             tempCheckListItems: [],
 
             checkListSubmitted: false, // hide the buttons if true
-            dealershipName: '',
-            endcustomer: '',
-            items: [],
+            // dealershipName: '',
+            // endcustomer: '',
+            // items: [],
             isComplete: false,
             showdealershipName: false,
             showModal: false,
@@ -43,15 +43,17 @@ class WelcomePacketCheckList extends Component {
             buttonValue_2: '',
             refresh: false,
 
+
             // custom label for checklist
             isShowAddLabelModal: false,
-            disableLabelAddButton: false,
-            customLabel: '',
+            isCharLimitExceeded: false,
+            // holds checklist item data for the item that is updating
+            customLabelObject: { id: '', name: '', label: '' },
+            isUpdatingLabel: false,
+            labelValue: '',
         };
         // console.log('Inside WelcomePacket Constructor')
     }
-
-
 
     // isComplete = false;
     async componentDidMount() {
@@ -75,56 +77,18 @@ class WelcomePacketCheckList extends Component {
         this.setState({ showModal: showModal });
     }
 
-    async searchCustomer(dealershipName, event) {
-        console.log('customer ID searching...:', dealershipName);
-        const response = await axios.get(`${url}/${dealershipName}`)
-        console.log('res', response,)
-
-        const dealersChecklist = response.data.results.dealersChecklist
-        console.log('# keys', Object.keys(dealersChecklist).length);
-
-        if (typeof (dealersChecklist) === 'undefined' || Object.keys(dealersChecklist).length === 0) {
-            this.showModal({
-                modalTitle: 'Record Not Found',
-                modalBody: `No record found for customer: ${this.state.dealershipName}`,
-                showModal: true,
-                button1Value: 'Ok'
-            });
-        }
-
-        if (dealersChecklist.length > 1) {
-            this.setState({ dealershipName: dealershipName });
-            this.setState({ showdealershipName: true })
-        }
-
-        this.setState({ items: dealersChecklist })
-        this.setState({ checkListSubmitted: this.isSubmited(this.state.items) })
-
-        // disable checklist if forms already submitted before
-        if (this.state.checkListSubmitted) {
-            this.setState({ disableCheckBoxes: true });
-        }
-        console.log('checklist-submitted', this.checkListSubmitted);
-
-        event.target.reset();
-    }
-
     handleChange = (event) => {
-        // let items = this.state.items;
         console.log('handling click checkbox')
         let items = this.state.dealer.checklists;
-
         items.forEach(item => {
             if (item.name === event.target.name) {
                 item.isChecked = event.target.checked;
             }
         });
-
         const dealer = this.state.dealer
         dealer.checklists = items
         this.setState({ dealer })
-        this.setState({ isComplete: this.state.items.every(i => i.isChecked === true) })
-
+        // this.setState({ isComplete: this.state.items.every(i => i.isChecked === true) })
         console.log('all checked: ', this.state.dealer.checklists.every(i => i.isChecked === true));
         this.setState({ isComplete: this.state.dealer.checklists.every(i => i.isChecked === true) })
     }
@@ -135,14 +99,10 @@ class WelcomePacketCheckList extends Component {
 
         const payload = JSON.stringify(this.state.dealer);
         this.setState({ isUpdating: true })
-        console.log('SEND TO BACKEND: ', payload)
 
         const response = await axios.put(`${url}/${dealershipName}?update=true`, payload);
-        console.log('response,', response.data)
         const str_val = JSON.stringify(response.data);
-        console.log(str_val)
         const data = JSON.parse(str_val)
-        console.log(data.statusCode)
 
         this.showModal({
             modalTitle: `CusotmerID: ${response.data.id}`,
@@ -187,13 +147,6 @@ class WelcomePacketCheckList extends Component {
         window.location.reload();
     }
 
-    // lookupCustomerData = (event) => {
-    //     event.preventDefault();
-    //     console.log('value: ', this.state.dealershipName);
-    //     const response = this.searchCustomer(this.state.dealershipName, event)
-    //     event.preventDefault();
-    // }
-
     isSubmited(data) {
         return data.every(item => item.isChecked === true);
     }
@@ -204,27 +157,19 @@ class WelcomePacketCheckList extends Component {
         console.log('itemId', itemId);
         const tempCheckListItems = this.state.tempCheckListItems
 
-        // handle duplicate
         tempCheckListItems.push({
             "id": itemId,
             "name": itemName,
             "label": value,
+            "isChecked": false
         });
         this.setState({ tempCheckListItems })
         console.log('TEMP CHECKLIST ITEMS: ', this.state.tempCheckListItems);
     }
 
-    // adminCancelChanges = (event) => {
-    //     event.preventDefault();
-    //     console.log('Admin cancel changes: ');
-    //     this.reload()
-    // }
-
     adminSaveChanges = (event) => {
         event.preventDefault();
-        this.print('Admin SAVING changes: ', event.target);
-
-        //needs to update the state of  dealer checklist lable 
+        console.log('Admin SAVING changes: ', event.target);
         const dealer = this.state.dealer;
         const dealerChecklist = dealer.checklists;
         let tempCheckListItems = this.state.tempCheckListItems;
@@ -237,60 +182,69 @@ class WelcomePacketCheckList extends Component {
             });
         });
 
+        dealer.isCompleted = false
         tempCheckListItems = []
         this.setState({ dealer })
         this.setState({ tempCheckListItems })
-
-        this.print('Finally, ')
-
-        console.log('UPDATED DEALER CHECKLIST ')
-        console.log(this.state.dealer)
-
-        console.log('*** TEMP CHECK LIST')
-        console.log(this.state.tempCheckListItems)
-
         this.update(event);
     }
-
-    print(val) {
-        console.log(val);
-    }
-
 
     openAddLabelModal = () => {
         console.log('adding stuff to the list');
         this.setState({ isShowAddLabelModal: true });
     }
 
-    addLabel = (e) => {
-        const label = document.getElementById('cbx-label').value;
-        console.log('target.value', label);
+    /**
+     * currenty works with adding a new label / checklist content
+     * when user adds a new label in the text-area he/she clicks on teh add button to a new label to the list
+     * a new id is added current item size + 1
+     * a new name is added userDefinedLabel_id
+     * the function takes the current deaer.checklist and upadates the checklist and update state of the dealer
+     */
+    addOrUpdateLabel = (e) => {
         const dealer = this.state.dealer
         const checklists = dealer.checklists
-        const id = checklists.length + 1;
+        const labelValue = this.state.labelValue
 
-        if (!label) {
-            return;
+        if (this.state.isUpdatingLabel && labelValue) {
+            console.log('udpating checklist label... ')
+            const customObject = this.state.customLabelObject
+            // console.log('customObject', customObject)
+            // console.log('upadted label', this.state.labelValue)
+            checklists.forEach(item => {
+                if (item.name === customObject.name) {
+                    item.label = labelValue;
+                }
+            })
+        } else {
+            console.log('Adding a new checklist item with label: ', labelValue)
+            // const label = document.getElementById('cbx-label').value;
+            const id = checklists.length + 1;
+            const item = {
+                'id': id,
+                'name': 'userDefinedLabel_' + id,
+                'label': labelValue,
+                'isChecked': false
+            }
+            dealer.isCompleted = false;
+            checklists.push(item);
         }
 
-        const item = {
-            'id': id,
-            'name': 'userDefinedLabel_' + id,
-            'label': label,
-            'isChecked': false
-        }
-
-        checklists.push(item);
         this.setState({ dealer });
-
         this.setState({ isShowAddLabelModal: false });
     }
 
-    manageAddLabel = (e) => {
-        const labelChar = e.target.value;
-        console.log('text-area value: ', labelChar);
-        const disable = labelChar.length > 255 ? true : false;
-        this.setState({ disableLabelAddButton: disable })
+    /**
+     * applies to text area when new checklsit label is added:
+     * observes if the content type in the text-area does not exceeds max character limits (256) -> 
+     * disable add button and shows alert
+     **/
+    validateLabelContent = (e) => {
+        this.setState({ labelValue: e.target.value })
+        // const labelChar = e.target.value;
+        // console.log('text-area value: ', labelChar);
+        const disable = this.state.labelValue.length > 255 ? true : false;
+        this.setState({ isCharLimitExceeded: disable })
         if (disable) {
             alert('Exceeded Max character count (256)');
         }
@@ -298,6 +252,39 @@ class WelcomePacketCheckList extends Component {
 
     reload = () => {
         window.location.reload(false);
+    }
+
+    /* Allows admin to edit checklist label / content -> opens up chosen label in a modal and allow user to update and save */
+    editLabel = (itemData) => {
+        console.log('itemData', itemData);
+        this.setState({ customLabelObject: itemData });
+
+        this.setState({ labelValue: itemData.label });
+
+        this.setState({ isShowAddLabelModal: true });
+        this.setState({ isUpdatingLabel: true });
+
+        const dealer = this.state.dealer;
+        dealer.checklists.forEach(item => {
+            if (itemData.name === item.name) {
+                item.label = itemData.label
+            }
+        });
+        this.setState({ dealer });
+    }
+
+    /* Allows admin to delete a checklist item / label */
+    removeLabel = (itemData) => {
+        console.log('itemData', itemData);
+        const dealer = this.state.dealer;
+        const filteredList = dealer.checklists.filter((item) => {
+            return item.name !== itemData.name
+        });
+
+        console.log('filteredCheckList', filteredList)
+        dealer.checklists = filteredList
+        this.setState({ dealer })
+        // make axio.put call to update the database in the be
     }
 
     render() {
@@ -328,6 +315,8 @@ class WelcomePacketCheckList extends Component {
                                                 dealer={this.state.dealer}
                                                 isAdmin={this.state.isAdmin}
                                                 onChange={this.handleChange}
+                                                editLabel={this.editLabel}
+                                                removeLabel={this.removeLabel}
                                                 handleOnChangeLabel={this.handleOnChangeLabel}
                                                 disableCheckBoxes={this.state.dealer.isCompleted}
                                                 {...item} />
@@ -344,7 +333,7 @@ class WelcomePacketCheckList extends Component {
                                         isAllChecked={this.state.isComplete} />
                                     : this.state.isAdmin ? <AdminButton
                                         isAdmin={this.state.isAdmin}
-                                        cancelChanges={()=> window.location.reload(false)}
+                                        cancelChanges={() => window.location.reload(false)}
                                         saveChanges={this.adminSaveChanges} />
                                         : null
                             }
@@ -359,27 +348,36 @@ class WelcomePacketCheckList extends Component {
                             />
                         </Form>
                     </fieldset>
-                    {
+                    { // Button: Add new item - > adds new a label + checklist item (only role - admin or cx)
                         this.state.isAdmin ?
                             <div className="addLabelModal">
-                                <Button variant="primary" onClick={this.openAddLabelModal}>Add an Item</Button>
+                                <Button variant="primary" onClick={() => this.setState({ isShowAddLabelModal: true })}>Add new Item</Button>
                                 <Modal show={this.state.isShowAddLabelModal} onHide={this.handleCloseModal}>
-                                    <Modal.Header>Modal Heading</Modal.Header>
+                                    <Modal.Header>Checklist Item</Modal.Header>
                                     <Modal.Body>
-                                        <label for="cbx-label">Enter new Item below</label>
+                                        <label for="cbx-label">{this.state.isUpdatingLabel ? 'Update content below or cancel' : 'Enter new Item below'}</label>
                                         <textarea
                                             id="cbx-label"
                                             name="cbx-label"
                                             row="10" cols="50"
                                             minLength="5" maxLength="256"
-                                            defaultValue={this.state.customLabel}
+                                            // defaultValue={this.state.customLabelObject.label}
                                             placeholder="Max 256 characters"
-                                            onChange={this.manageAddLabel}>
+                                            value={this.state.labelValue}
+                                            onChange={this.validateLabelContent}>
                                         </textarea>
                                     </Modal.Body>
                                     <Modal.Footer>
-                                        <Button variant='primary' onClick={(e) => { this.setState({ isShowAddLabelModal: false }) }}>Cancel</Button>
-                                        <Button variant='primary' disabled={this.state.disableLabelAddButton} onClick={this.addLabel}>Add</Button>
+                                        <Button variant='primary' onClick={(e) => { this.setState({ isShowAddLabelModal: false }) }}>
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant='primary'
+                                            disabled={this.state.isCharLimitExceeded}
+                                            // onClick={this.state.isUpdatingLabel ? this.updateLabel : this.addLabel}>
+                                            onClick={this.addOrUpdateLabel}>
+                                            {this.state.isUpdatingLabel ? 'Update' : 'Add'}
+                                        </Button>
                                     </Modal.Footer>
                                 </Modal>
                             </div>

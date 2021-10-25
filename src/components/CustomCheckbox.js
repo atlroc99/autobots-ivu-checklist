@@ -1,50 +1,46 @@
 import React from "react";
-import { Form } from "react-bootstrap";
-import EditableLabel from "react-editable-label";
+import { Form, Button, Row } from "react-bootstrap";
 
 const CustomCheckbox = (props) => {
-    // console.log('inside CustomCheckox: isAdmin:', props.isAdmin);
-    console.log('CustomCheckbox PROPS', props);
+    // console.log('CustomCheckbox PROPS', props);
+    const currentItem = {
+        'name': props.name,
+        'id': props.id,
+        'label': props.label
+    }
+
     return (
-        <Form.Check type='checkbox' id={props.id} >
-            <Form.Check.Input
+        <Form as={Row}>
+            <Form.Check
+                column sm="6"
                 type='checkbox'
-                key={props.id}
                 id={props.id}
                 name={props.name}
-                value={props.isChecked}
                 checked={props.isChecked}
-                onChange={props.handleChange}
-                disabled={props.isAdmin || props.dealer.isCompleted} />
-            <EditableLabel
-                initialValue={props.label}
-                // save= {value=> props.handleOnChangeLabel(value, this)}
-                save= {value=> props.handleOnChangeLabel(value, props.name, props.id)}
-            />
-            {/* <label for={props.id}
-                contentEditable={props.isAdmin}
-                value={props.label}
-                onChange={props.handleOnChangeLabel}>
-                {props.label}
-            </label> */}
-            {/* <Form.Label
-                contentEditable={props.isAdmin}
-                value={props.label}
-                onChange={(e)=>props.handleOnChangeLabel(e)}>{props.label}
-            </Form.Label> */}
-        </Form.Check>
-
-
-        // key={props.id}
-        // type="checkbox"
-        // disabled={props.disableCheckBoxes}
-        // name={props.name}
-        // value={props.isChecked}
-        // checked={props.isChecked}
-        // onChange={props.onChange}
-        // label={props.label} />
-        // onChange={() => setITSecurityDocReviewedAndApproved(!iTSecurityDocReviewedAndApproved)}
+                // disabled={props.isAdmin}
+                onChange={props.onChange}
+                label={props.label}>
+            </Form.Check >
+            {//edit and delete label
+                props.isAdmin ?
+                    <Form.Check column="4">
+                        <Button className="btn-sm"
+                            onClick={() => props.editLabel(currentItem)} >
+                            <i className="fas fa-pencil-alt"></i>
+                        </Button>
+                        <Button className="btn-sm" style={buttonStyle}
+                            onClick={() => props.removeLabel(currentItem)} >
+                            <i class="fas fa-trash-alt"></i>
+                        </Button>
+                    </Form.Check>
+                    : null
+            }
+        </Form >
     )
+}
+
+const buttonStyle = {
+    paddingLeft: '10px'
 }
 
 export default CustomCheckbox;
