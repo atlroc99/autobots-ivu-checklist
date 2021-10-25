@@ -5,6 +5,7 @@ import LiteModal from './LiteModal';
 import CustomCheckbox from './CustomCheckbox';
 import AdminButton from "./AdminButton";
 import UserButton from "./UserButton";
+import {v4 as uuidv4, v4} from 'uuid';
 
 // const url = 'http://localhost:8000';
 const url = 'http://localhost:3000/checklists';
@@ -216,20 +217,24 @@ class WelcomePacketCheckList extends Component {
                     item.label = labelValue;
                 }
             })
+            // ???
+            this.setState({isUpdatingLabel:false})
         } else {
             console.log('Adding a new checklist item with label: ', labelValue)
             // const label = document.getElementById('cbx-label').value;
-            const id = checklists.length + 1;
+            const uuid = uuidv4().substr(0,8);
             const item = {
-                'id': id,
-                'name': 'userDefinedLabel_' + id,
+                'id': uuid,
+                'name': 'userDefinedLabel_' + uuid,
                 'label': labelValue,
                 'isChecked': false
             }
-            dealer.isCompleted = false;
+            
+            // dealer.isCompleted = false;
             checklists.push(item);
         }
 
+        this.setState({labelValue:''})
         this.setState({ dealer });
         this.setState({ isShowAddLabelModal: false });
     }
