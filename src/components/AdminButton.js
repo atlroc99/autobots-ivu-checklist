@@ -11,8 +11,9 @@ const AdminButton = (props) => {
                     <Button
                         variant="primary"
                         onClick={()=> props.isShowAddLabelModal(true)}
-                        style={{ width: '200px', margin: '5px' }}>
-                        Add new Item
+                        style={{ width: '110px', margin: '5px' }}>
+                        <span style={{ marginRight: '15px' }}>Add</span>
+                        <i class="fas fa-plus-circle"></i>
                     </Button>
                 </div>
             </div>
@@ -22,7 +23,7 @@ const AdminButton = (props) => {
                         onClick={props.cancelChanges}
                         variant="primary"
                         // disabled={!this.state.isComplete}
-                        style={{ width: '200px', margin: '5px' }}>
+                        style={{ width: '110px', margin: '5px' }}>
                         <span style={{ marginRight: '15px' }}>Cancel</span>
                         <i className="fas fa-sync-alt" />
                     </Button>
@@ -32,7 +33,7 @@ const AdminButton = (props) => {
                         onClick={props.saveChanges}
                         variant="danger"
                         // disabled={!this.state.isComplete}
-                        style={{ width: '200px', margin: '5px' }}>
+                        style={{ width: '100px', margin: '5px', marginLeft:'430px'}}>
                         <span style={{ marginRight: '15px' }}>Save</span>
                         <i className="fas fa-sync-alt" />
                     </Button>

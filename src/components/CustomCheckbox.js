@@ -29,7 +29,7 @@ const CustomCheckbox = (props) => {
                 <td>
                     {//edit and delete label
                         props.isAdmin ?
-                            <Form.Check column="4">
+                            <Form.Check column="4" style={{marginLeft:'150px', padding:'10px'}}>
                                 <Button
                                     onClick={() => props.editLabel(currentItem)} >
                                     <i className="fas fa-pencil-alt"></i>

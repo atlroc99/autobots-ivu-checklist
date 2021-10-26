@@ -1,7 +1,8 @@
 html,
 body {
   width: 100%;
-  background: rgb(51, 59, 63);
+  background: rgb(255, 255, 255);
+  font-family: serif;
 }
 .logoHome {
   margin-top: 200px;
@@ -17,17 +18,17 @@ body {
   font-family: "Times New Roman", Times, serif;
 }
 .title {
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-family: serif;
   font-weight: bold;
   padding-top: 5px;
   padding-bottom: 5px;
   color: white;
   margin-top: 20px;
   margin-bottom: 15px;
-  background-color: rgb(59, 61, 61);
+  background-color: rgb(238, 28, 36);
 }
 .fa-list-alt {
-  color: rgb(168, 8, 8);
+  color: rgb(110, 4, 4);
   margin: 10px;
 }
 .fa-hand-point-right {
@@ -36,7 +37,7 @@ body {
 .checklistBox {
   width: 1580px;
   /* margin-left: 50px; */
-  margin-top: 100px;
+  margin-top: 50px;
   background: white;
   padding: 15px;
   box-shadow: 1px 2px 1px 2px rgb(212, 211, 211);
@@ -69,10 +70,10 @@ body {
 
 /* css style for search customerID */
 .searchForm {
-  margin: '100px';
-  padding-top: '50px'
+  margin: "100px";
+  padding-top: "50px";
 }
 
 .searchFormInput {
-  margin-left: '10px'
+  margin-left: "10px";
 }
