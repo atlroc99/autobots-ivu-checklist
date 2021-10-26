@@ -21,7 +21,8 @@ const CustomCheckbox = (props) => {
                         checked={props.isChecked}
                         onChange={props.onChange}
                         label={props.label}
-                    // disabled={props.isAdmin}
+                        // disabled={props.isAdmin}
+                        disabled={props.disableCheckBoxes}
                     >
                     </Form.Check >
                 </td>

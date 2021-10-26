@@ -15,7 +15,7 @@ class WelcomePacketCheckList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isAdmin: true,
+            isAdmin: false,
             dealer: {
                 checklists: [],
                 dealerName: '',
@@ -24,8 +24,13 @@ class WelcomePacketCheckList extends Component {
                 endCustomerCompany: '',
                 isCompleted: false,
                 systemName: '',
-                uiTheme: ''
+                uiTheme: '',
+                migrationDate: new Date(),
+                migrationDateStr: '',
+                migrationDateEpoch: 0,
             },
+
+            dateStr: '',
 
             tempCheckListItems: [],
 
@@ -79,6 +84,15 @@ class WelcomePacketCheckList extends Component {
         this.setState({ showModal: showModal });
     }
 
+    chooseMigrationDate = (migrationDate) => {
+        const epochTime = migrationDate.getTime() / 1000;
+        const dealer = this.state.dealer;
+        dealer.migrationDate = migrationDate;
+        dealer.migrationDateStr(migrationDate.toDateString())
+        dealer.migrationDateEpoch(epochTime)
+        this.setState({ dealer })
+    }
+
     handleChange = (event) => {
         console.log('handling click checkbox')
         let items = this.state.dealer.checklists;
@@ -120,8 +134,8 @@ class WelcomePacketCheckList extends Component {
         console.log('submtting data for: ', this.state.dealer.dealerName);
         this.setState({ isSubmitting: true });
         this.showModal({
-            modalTitle: `'Submitting data for ${this.state.dealer.dealerName}`,
-            modalBody: 'Are you sure? Once Submitted, you will not be able to update the data',
+            modalTitle: `Submitting data for ${this.state.dealer.dealerName}`,
+            modalBody: 'Once Submitted, you will not be able to update the data. Please choose a migration date if you want to submit',
             showModal: true,
             button1Value: 'Yes',
             button2Value: 'No',
@@ -305,6 +319,7 @@ class WelcomePacketCheckList extends Component {
                     <div className="col col-6">
                         <h5 style={{ float: 'right', marginTop: '20px', marginRight: '70px' }}>{this.state.dealer.endCustomerCompany}</h5>
                     </div>
+
                 </div>
                 <hr />
                 <div className="checklistBox">
@@ -350,6 +365,7 @@ class WelcomePacketCheckList extends Component {
                                 body={this.state.modalBody}
                                 show={this.state.showModal}
                                 handleClose={this.handleCloseModal}
+                                chooseMigrationDate={this.chooseMigrationDate}
                                 onClick={this.state.isUpdating ? this.handleCloseModal : this.handleAcceptDataSubmission}
                                 buttonValue_1={this.state.buttonValue_1}
                                 buttonValue_2={this.state.buttonValue_2}
