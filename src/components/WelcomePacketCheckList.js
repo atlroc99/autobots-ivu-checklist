@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { Form, Modal, Button } from 'react-bootstrap';
+import Table from 'react-bootstrap/Table';
 import axios from 'axios';
 import LiteModal from './LiteModal';
 import CustomCheckbox from './CustomCheckbox';
 import AdminButton from "./AdminButton";
 import UserButton from "./UserButton";
-import {v4 as uuidv4, v4} from 'uuid';
+import { v4 as uuidv4, v4 } from 'uuid';
 
 // const url = 'http://localhost:8000';
 const url = 'http://localhost:3000/checklists';
@@ -218,23 +219,23 @@ class WelcomePacketCheckList extends Component {
                 }
             })
             // ???
-            this.setState({isUpdatingLabel:false})
+            this.setState({ isUpdatingLabel: false })
         } else {
             console.log('Adding a new checklist item with label: ', labelValue)
             // const label = document.getElementById('cbx-label').value;
-            const uuid = uuidv4().substr(0,8);
+            const uuid = uuidv4().substr(0, 8);
             const item = {
                 'id': uuid,
                 'name': 'userDefinedLabel_' + uuid,
                 'label': labelValue,
                 'isChecked': false
             }
-            
+
             // dealer.isCompleted = false;
             checklists.push(item);
         }
 
-        this.setState({labelValue:''})
+        this.setState({ labelValue: '' })
         this.setState({ dealer });
         this.setState({ isShowAddLabelModal: false });
     }
@@ -263,9 +264,7 @@ class WelcomePacketCheckList extends Component {
     editLabel = (itemData) => {
         console.log('itemData', itemData);
         this.setState({ customLabelObject: itemData });
-
         this.setState({ labelValue: itemData.label });
-
         this.setState({ isShowAddLabelModal: true });
         this.setState({ isUpdatingLabel: true });
 
@@ -312,23 +311,27 @@ class WelcomePacketCheckList extends Component {
                     <fieldset>
                         <Form className="p-4">
                             <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
-                            {// render checklist
-                                this.state.dealer.checklists.map((item, idx) => {
-                                    return (
-                                        <Form.Group key={idx}>
-                                            <CustomCheckbox
-                                                dealer={this.state.dealer}
-                                                isAdmin={this.state.isAdmin}
-                                                onChange={this.handleChange}
-                                                editLabel={this.editLabel}
-                                                removeLabel={this.removeLabel}
-                                                handleOnChangeLabel={this.handleOnChangeLabel}
-                                                disableCheckBoxes={this.state.dealer.isCompleted}
-                                                {...item} />
-                                        </Form.Group>
-                                    )
-                                })
-                            }
+                            <Table borderless hover size='lg'>
+                                <tbody>
+                                    {// render checklist
+                                        this.state.dealer.checklists.map((item, idx) => {
+                                            return (
+                                                <Form.Group key={idx}>
+                                                    <CustomCheckbox
+                                                        dealer={this.state.dealer}
+                                                        isAdmin={this.state.isAdmin}
+                                                        onChange={this.handleChange}
+                                                        editLabel={this.editLabel}
+                                                        removeLabel={this.removeLabel}
+                                                        handleOnChangeLabel={this.handleOnChangeLabel}
+                                                        disableCheckBoxes={this.state.dealer.isCompleted}
+                                                        {...item} />
+                                                </Form.Group>
+                                            )
+                                        })
+                                    }
+                                </tbody>
+                            </Table>
                             {
                                 !this.state.isAdmin && !this.state.dealer.isCompleted ?
                                     <UserButton
@@ -373,7 +376,13 @@ class WelcomePacketCheckList extends Component {
                                         </textarea>
                                     </Modal.Body>
                                     <Modal.Footer>
-                                        <Button variant='primary' onClick={(e) => { this.setState({ isShowAddLabelModal: false }) }}>
+                                        <Button variant='primary' onClick={(e) => {
+                                            this.setState({ // setting all value to default. Avoding item label previsouly subject to update showing up in the areabox when add new item btn is clicked
+                                                isShowAddLabelModal: false,
+                                                isUpdatingLabel: false,
+                                                labelValue: ""
+                                            })
+                                        }}>
                                             Cancel
                                         </Button>
                                         <Button
