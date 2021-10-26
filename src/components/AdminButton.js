@@ -1,11 +1,21 @@
 import React, { Component } from "react";
-import { Button } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'react-bootstrap';
 
 const AdminButton = (props) => {
     console.log("inside admin button: isAdmin: ", props.isAdmin)
     console.log("PROPS: ", props)
     return (
         <div>
+            <div className="row">
+                <div className="col col-md">
+                    <Button
+                        variant="primary"
+                        onClick={()=> props.isShowAddLabelModal(true)}
+                        style={{ width: '200px', margin: '5px' }}>
+                        Add new Item
+                    </Button>
+                </div>
+            </div>
             <div className="row">
                 <div className="col col-md">
                     <Button type="submit"

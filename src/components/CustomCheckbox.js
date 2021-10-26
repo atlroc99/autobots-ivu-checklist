@@ -29,7 +29,6 @@ const CustomCheckbox = (props) => {
                 <td>
                     {//edit and delete label
                         props.isAdmin ?
-                            // <div className="btn-toolbar">
                             <Form.Check column="4">
                                 <Button
                                     onClick={() => props.editLabel(currentItem)} >
@@ -40,7 +39,6 @@ const CustomCheckbox = (props) => {
                                     <i class="fas fa-trash-alt"></i>
                                 </Button>
                             </Form.Check>
-
                             : null
                     }
                 </td>

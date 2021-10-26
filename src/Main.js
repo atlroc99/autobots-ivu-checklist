@@ -9,14 +9,14 @@ function App() {
 
   return (
     <div className="container">
-      {/* <Layout> */}
+      <Layout>
       <BrowserRouter>
         <Switch>
           <Route exact path='/checklist/:dealership' component={WelcomePacketCheckList}/>
         </Switch>
       </BrowserRouter>
 
-      {/* </Layout> */}
+      </Layout>
 
       {/* {
         isSending ?

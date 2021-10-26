@@ -7,6 +7,7 @@ import CustomCheckbox from './CustomCheckbox';
 import AdminButton from "./AdminButton";
 import UserButton from "./UserButton";
 import { v4 as uuidv4, v4 } from 'uuid';
+import CHECKLIST from "./test";
 
 // const url = 'http://localhost:8000';
 const url = 'http://localhost:3000/checklists';
@@ -15,7 +16,7 @@ class WelcomePacketCheckList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isAdmin: false,
+            isAdmin: true,
             dealer: {
                 checklists: [],
                 dealerName: '',
@@ -31,6 +32,7 @@ class WelcomePacketCheckList extends Component {
             },
 
             dateStr: '',
+            lockCheckBoxes: false,
 
             tempCheckListItems: [],
 
@@ -65,10 +67,12 @@ class WelcomePacketCheckList extends Component {
     // isComplete = false;
     async componentDidMount() {
         console.log('in componentDidMount')
-        const response = await axios.get(url + `/${this.props.match.params.dealership}`);
+        // const response = await axios.get(url + `/${this.props.match.params.dealership}`);
+        // const dealer = { ...response.data }
+        const response = CHECKLIST;
         console.log('response', response)
-        // const { data } = JSON.parse(response.data);
-        const dealer = { ...response.data }
+        const dealer = { ...response }
+        this.setState({ lockCheckBoxes: dealer.isCompleted })
         this.setState({ dealer })
         console.log(this.state.dealer)
         // this.setState({ isAdmin: true })
@@ -88,8 +92,8 @@ class WelcomePacketCheckList extends Component {
         const epochTime = migrationDate.getTime() / 1000;
         const dealer = this.state.dealer;
         dealer.migrationDate = migrationDate;
-        dealer.migrationDateStr(migrationDate.toDateString())
-        dealer.migrationDateEpoch(epochTime)
+        dealer.migrationDateStr = migrationDate.toDateString()
+        dealer.migrationDateEpoch = epochTime
         this.setState({ dealer })
     }
 
@@ -313,107 +317,115 @@ class WelcomePacketCheckList extends Component {
                         <h2>Welcome Packet checklist</h2>
                         <h5>{this.state.dealer.dealerName}</h5>
                         <hr />
-                        <h6>Logged in As Admin: {this.state.isAdmin ? 'True' : 'False'}</h6>
-                        <h6>dealer submitted / completed form: {this.state.dealer.isCompleted ? 'True' : 'False'}</h6>
                     </div>
                     <div className="col col-6">
                         <h5 style={{ float: 'right', marginTop: '20px', marginRight: '70px' }}>{this.state.dealer.endCustomerCompany}</h5>
                     </div>
-
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <h6>Logged in As Admin: {this.state.isAdmin ? 'True' : 'False'}</h6>
+                        <h6>dealer submitted / completed form: {this.state.dealer.isCompleted ? 'True' : 'False'}</h6>
+                    </div>
                 </div>
                 <hr />
-                <div className="checklistBox">
-                    <fieldset>
-                        <Form className="p-4">
-                            <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
-                            <Table borderless hover size='lg'>
-                                <tbody>
-                                    {// render checklist
-                                        this.state.dealer.checklists.map((item, idx) => {
-                                            return (
-                                                <Form.Group key={idx}>
-                                                    <CustomCheckbox
-                                                        dealer={this.state.dealer}
-                                                        isAdmin={this.state.isAdmin}
-                                                        onChange={this.handleChange}
-                                                        editLabel={this.editLabel}
-                                                        removeLabel={this.removeLabel}
-                                                        handleOnChangeLabel={this.handleOnChangeLabel}
-                                                        disableCheckBoxes={this.state.dealer.isCompleted}
-                                                        {...item} />
-                                                </Form.Group>
-                                            )
-                                        })
-                                    }
-                                </tbody>
-                            </Table>
-                            {
-                                !this.state.isAdmin && !this.state.dealer.isCompleted ?
-                                    <UserButton
-                                        update={this.update}
-                                        submit={this.submit}
-                                        isAdmin={this.state.isAdmin}
-                                        isAllChecked={this.state.isComplete} />
-                                    : this.state.isAdmin ? <AdminButton
-                                        isAdmin={this.state.isAdmin}
-                                        cancelChanges={() => window.location.reload(false)}
-                                        saveChanges={this.adminSaveChanges} />
-                                        : null
-                            }
-                            <LiteModal
-                                title={this.state.modalTitle}
-                                body={this.state.modalBody}
-                                show={this.state.showModal}
-                                handleClose={this.handleCloseModal}
-                                chooseMigrationDate={this.chooseMigrationDate}
-                                onClick={this.state.isUpdating ? this.handleCloseModal : this.handleAcceptDataSubmission}
-                                buttonValue_1={this.state.buttonValue_1}
-                                buttonValue_2={this.state.buttonValue_2}
-                            />
-                        </Form>
-                    </fieldset>
-                    { // Button: Add new item - > adds new a label + checklist item (only role - admin or cx)
-                        this.state.isAdmin ?
-                            <div className="addLabelModal">
-                                <Button variant="primary" onClick={() => this.setState({ isShowAddLabelModal: true })}>Add new Item</Button>
-                                <Modal show={this.state.isShowAddLabelModal} onHide={this.handleCloseModal}>
-                                    <Modal.Header>Checklist Item</Modal.Header>
-                                    <Modal.Body>
-                                        <label for="cbx-label">{this.state.isUpdatingLabel ? 'Update content below or cancel' : 'Enter new Item below'}</label>
-                                        <textarea
-                                            id="cbx-label"
-                                            name="cbx-label"
-                                            row="10" cols="50"
-                                            minLength="5" maxLength="256"
-                                            // defaultValue={this.state.customLabelObject.label}
-                                            placeholder="Max 256 characters"
-                                            value={this.state.labelValue}
-                                            onChange={this.validateLabelContent}>
-                                        </textarea>
-                                    </Modal.Body>
-                                    <Modal.Footer>
-                                        <Button variant='primary' onClick={(e) => {
-                                            this.setState({ // setting all value to default. Avoding item label previsouly subject to update showing up in the areabox when add new item btn is clicked
-                                                isShowAddLabelModal: false,
-                                                isUpdatingLabel: false,
-                                                labelValue: ""
+                <div className="row">
+                    <div className="checklistBox">
+                        <fieldset>
+                            <Form className="p-4">
+                                <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
+                                <Table borderless hover size='lg'>
+                                    <tbody>
+                                        {// render checklist
+                                            this.state.dealer.checklists.map((item, idx) => {
+                                                return (
+                                                    <Form.Group key={idx}>
+                                                        <CustomCheckbox
+                                                            dealer={this.state.dealer}
+                                                            isAdmin={this.state.isAdmin}
+                                                            onChange={this.handleChange}
+                                                            editLabel={this.editLabel}
+                                                            removeLabel={this.removeLabel}
+                                                            handleOnChangeLabel={this.handleOnChangeLabel}
+                                                            // disableCheckBoxes={this.state.dealer.isCompleted}
+                                                            disableCheckBoxes={this.state.lockCheckBoxes}
+                                                            {...item} />
+                                                    </Form.Group>
+                                                )
                                             })
-                                        }}>
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            variant='primary'
-                                            disabled={this.state.isCharLimitExceeded}
-                                            // onClick={this.state.isUpdatingLabel ? this.updateLabel : this.addLabel}>
-                                            onClick={this.addOrUpdateLabel}>
-                                            {this.state.isUpdatingLabel ? 'Update' : 'Add'}
-                                        </Button>
-                                    </Modal.Footer>
-                                </Modal>
-                            </div>
-                            : null
-                    }
+                                        }
+                                    </tbody>
+                                </Table>
+                                {
+                                    !this.state.isAdmin && !this.state.dealer.isCompleted ?
+                                        <UserButton
+                                            update={this.update}
+                                            submit={this.submit}
+                                            isAdmin={this.state.isAdmin}
+                                            isAllChecked={this.state.isComplete} />
+                                        : this.state.isAdmin ? <AdminButton
+                                            isAdmin={this.state.isAdmin}
+                                            isShowAddLabelModal={(yes) => { this.setState({ isShowAddLabelModal: yes }) }}
+                                            cancelChanges={() => window.location.reload(false)}
+                                            saveChanges={this.adminSaveChanges} />
+                                            : null
+                                }
+                                <LiteModal
+                                    title={this.state.modalTitle}
+                                    body={this.state.modalBody}
+                                    show={this.state.showModal}
+                                    handleClose={this.handleCloseModal}
+                                    chooseMigrationDate={this.chooseMigrationDate}
+                                    onClick={this.state.isUpdating ? this.handleCloseModal : this.handleAcceptDataSubmission}
+                                    buttonValue_1={this.state.buttonValue_1}
+                                    buttonValue_2={this.state.buttonValue_2}
+                                />
+                            </Form>
+                        </fieldset>
+                        { // Button: Add new item - > adds new a label + checklist item (only role - admin or cx)
+                            this.state.isAdmin ?
+                                <div className="addLabelModal">
+                                    {/* <Button variant="primary" onClick={() => this.setState({ isShowAddLabelModal: true })}>Add new Item</Button> */}
+                                    <Modal show={this.state.isShowAddLabelModal} onHide={this.handleCloseModal}>
+                                        <Modal.Header>Checklist Item</Modal.Header>
+                                        <Modal.Body>
+                                            <label for="cbx-label">{this.state.isUpdatingLabel ? 'Update content below or cancel' : 'Enter new Item below'}</label>
+                                            <textarea
+                                                id="cbx-label"
+                                                name="cbx-label"
+                                                row="10" cols="50"
+                                                minLength="5" maxLength="256"
+                                                // defaultValue={this.state.customLabelObject.label}
+                                                placeholder="Max 256 characters"
+                                                value={this.state.labelValue}
+                                                onChange={this.validateLabelContent}>
+                                            </textarea>
+                                        </Modal.Body>
+                                        <Modal.Footer>
+                                            <Button variant='primary' onClick={(e) => {
+                                                this.setState({ // setting all value to default. Avoding item label previsouly subject to update showing up in the areabox when add new item btn is clicked
+                                                    isShowAddLabelModal: false,
+                                                    isUpdatingLabel: false,
+                                                    labelValue: ""
+                                                })
+                                            }}>
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                variant='primary'
+                                                disabled={this.state.isCharLimitExceeded}
+                                                // onClick={this.state.isUpdatingLabel ? this.updateLabel : this.addLabel}>
+                                                onClick={this.addOrUpdateLabel}>
+                                                {this.state.isUpdatingLabel ? 'Update' : 'Add'}
+                                            </Button>
+                                        </Modal.Footer>
+                                    </Modal>
+                                </div>
+                                : null
+                        }
+                    </div>
                 </div>
+
             </div>
         )
     }
