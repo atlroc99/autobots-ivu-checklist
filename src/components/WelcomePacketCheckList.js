@@ -311,36 +311,34 @@ class WelcomePacketCheckList extends Component {
 
     render() {
         return (
-            <div>
+            <div style={{marginTop:'150px'}}>
                 <div className="row">
                     <div className="col col-6">
-                        <h2>Welcome Packet checklist</h2>
-                        <h5>{this.state.dealer.dealerName}</h5>
-                        <hr />
+                        <h2 style={{fontFamily:'serif',textTransform:'capitalize'}}>Welcome Packet checklist</h2>
+                        <h5 h2 style={{fontFamily:'serif',textTransform:'capitalize',}}>{this.state.dealer.dealerName}</h5>
                     </div>
                     <div className="col col-6">
-                        <h5 style={{ float: 'right', marginTop: '20px', marginRight: '70px' }}>{this.state.dealer.endCustomerCompany}</h5>
+                        <h5 style={{fontFamily:'serif',textTransform:'capitalize', float: 'right', marginTop: '50px', marginLeft: '300px' }}>{this.state.dealer.endCustomerCompany}</h5>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        <h6>Logged in As Admin: {this.state.isAdmin ? 'True' : 'False'}</h6>
-                        <h6>dealer submitted / completed form: {this.state.dealer.isCompleted ? 'True' : 'False'}</h6>
+                        <h6 style={{fontFamily:'serif'}}>Logged in As Admin: {this.state.isAdmin ? 'True' : 'False'}</h6>
+                        <h6 style={{fontFamily:'serif',textTransform:'capitalize'}}>dealer submitted / completed form: {this.state.dealer.isCompleted ? 'True' : 'False'}</h6>
                     </div>
                 </div>
-                <hr />
                 <div className="row">
                     <div className="checklistBox">
                         <fieldset>
                             <Form className="p-4">
                                 <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
                                 <Table borderless hover size='lg'>
-                                    <tbody>
+                                    <tbody style={{fontFamily:'serif', textAlign: 'justify'}}>
                                         {// render checklist
                                             this.state.dealer.checklists.map((item, idx) => {
                                                 return (
                                                     <Form.Group key={idx}>
-                                                        <CustomCheckbox
+                                                        <CustomCheckbox 
                                                             dealer={this.state.dealer}
                                                             isAdmin={this.state.isAdmin}
                                                             onChange={this.handleChange}
@@ -387,10 +385,10 @@ class WelcomePacketCheckList extends Component {
                                 <div className="addLabelModal">
                                     {/* <Button variant="primary" onClick={() => this.setState({ isShowAddLabelModal: true })}>Add new Item</Button> */}
                                     <Modal show={this.state.isShowAddLabelModal} onHide={this.handleCloseModal}>
-                                        <Modal.Header>Checklist Item</Modal.Header>
+                                        <Modal.Header style={{fontFamily:'serif'}}>Checklist Item</Modal.Header>
                                         <Modal.Body>
                                             <label for="cbx-label">{this.state.isUpdatingLabel ? 'Update content below or cancel' : 'Enter new Item below'}</label>
-                                            <textarea
+                                            <textarea 
                                                 id="cbx-label"
                                                 name="cbx-label"
                                                 row="10" cols="50"
