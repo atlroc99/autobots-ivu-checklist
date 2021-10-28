@@ -1,5 +1,5 @@
 {
-  "name": "pwd",
+  "name": "autobots-Welcome-Packet-SPA",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "PORT=8000 react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && zip -r welcomeSPA.zip build && aws s3 cp welcomeSPA.zip s3://alc-autobots-artifacts",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -36,7 +36,6 @@
   "browserslist": {
     "production": [
       ">0.2%",
-      "not dead",
       "not op_mini all"
     ],
     "development": [

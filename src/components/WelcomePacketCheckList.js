@@ -9,14 +9,20 @@ import UserButton from "./UserButton";
 import { v4 as uuidv4, v4 } from 'uuid';
 import CHECKLIST from "./test";
 
-// const url = 'http://localhost:8000';
-const url = 'http://localhost:3000/checklists';
+// using file
+// const url = 'http://localhost:8000/checklists';
+
+// SAM LOCAL SERVER
+const url = 'http://localhost:3000/checklists'; 
+
+// APIG
+// const url = 'https://k0neefoe9i.execute-api.us-west-1.amazonaws.com/v1/checklists';
 
 class WelcomePacketCheckList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isAdmin: true,
+            isAdmin: false,
             dealer: {
                 checklists: [],
                 dealerName: '',
@@ -67,11 +73,25 @@ class WelcomePacketCheckList extends Component {
     // isComplete = false;
     async componentDidMount() {
         console.log('in componentDidMount')
+        console.log('Hi, from WelcomePacketChecklist!', this.props);
+        //Comment these lines out if running locally
         // const response = await axios.get(url + `/${this.props.match.params.dealership}`);
-        // const dealer = { ...response.data }
-        const response = CHECKLIST;
+        const response = await axios.get(url + `/${this.props.dealership}`);
+        const dealer = { ...response.data }
+        
+        const serialNo = dealer.serialNumber.toLowerCase();
+        const systemName = serialNo.startsWith("i") ? 'iVu' : serialNo.startsWith("w") ? 'webCTRL' : null;
+        this.props.callme(systemName)
+        // comment these lines out before npm run build for prod or connecting to remote
+        // const response = CHECKLIST;
+        // const dealer = { ...response }
+        const params = new URLSearchParams(window.location.search)
+        const userType = params.get('userType')
+        console.log('usertype', userType);
+
+        this.setState({ isAdmin: userType && (userType === 'admin' || userType === 'CX')})
+
         console.log('response', response)
-        const dealer = { ...response }
         this.setState({ lockCheckBoxes: dealer.isCompleted })
         this.setState({ dealer })
         console.log(this.state.dealer)
@@ -311,34 +331,34 @@ class WelcomePacketCheckList extends Component {
 
     render() {
         return (
-            <div style={{marginTop:'150px'}}>
+            <div style={{ marginTop: '150px' }}>
                 <div className="row">
                     <div className="col col-6">
-                        <h2 style={{fontFamily:'serif',textTransform:'capitalize'}}>Welcome Packet checklist</h2>
-                        <h5 h2 style={{fontFamily:'serif',textTransform:'capitalize',}}>{this.state.dealer.dealerName}</h5>
+                        <h2 style={{ fontFamily: 'serif', textTransform: 'capitalize' }}>Welcome Packet checklist</h2>
+                        <h5 h2 style={{ fontFamily: 'serif', textTransform: 'capitalize', }}>{this.state.dealer.dealerName}</h5>
                     </div>
                     <div className="col col-6">
-                        <h5 style={{fontFamily:'serif',textTransform:'capitalize', float: 'right', marginTop: '50px', marginLeft: '300px' }}>{this.state.dealer.endCustomerCompany}</h5>
+                        <h5 style={{ fontFamily: 'serif', textTransform: 'capitalize', float: 'right', marginTop: '50px', marginLeft: '300px' }}>{this.state.dealer.endCustomerCompany}</h5>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        <h6 style={{fontFamily:'serif'}}>Logged in As Admin: {this.state.isAdmin ? 'True' : 'False'}</h6>
-                        <h6 style={{fontFamily:'serif',textTransform:'capitalize'}}>dealer submitted / completed form: {this.state.dealer.isCompleted ? 'True' : 'False'}</h6>
+                        <h6 style={{ fontFamily: 'serif' }}>Logged in As Admin: {this.state.isAdmin ? 'True' : 'False'}</h6>
+                        <h6 style={{ fontFamily: 'serif', textTransform: 'capitalize' }}>dealer submitted / completed form: {this.state.dealer.isCompleted ? 'True' : 'False'}</h6>
                     </div>
                 </div>
                 <div className="row">
                     <div className="checklistBox">
                         <fieldset>
                             <Form className="p-4">
-                                <div className="title"><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
+                                <div className="title" style={{backgroundColor:this.state.dealer.uiTheme}}><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
                                 <Table borderless hover size='lg'>
-                                    <tbody style={{fontFamily:'serif', textAlign: 'justify'}}>
+                                    <tbody style={{ fontFamily: 'serif', textAlign: 'justify' }}>
                                         {// render checklist
                                             this.state.dealer.checklists.map((item, idx) => {
                                                 return (
                                                     <Form.Group key={idx}>
-                                                        <CustomCheckbox 
+                                                        <CustomCheckbox
                                                             dealer={this.state.dealer}
                                                             isAdmin={this.state.isAdmin}
                                                             onChange={this.handleChange}
@@ -377,6 +397,7 @@ class WelcomePacketCheckList extends Component {
                                     onClick={this.state.isUpdating ? this.handleCloseModal : this.handleAcceptDataSubmission}
                                     buttonValue_1={this.state.buttonValue_1}
                                     buttonValue_2={this.state.buttonValue_2}
+                                    isSubmitting={this.state.isSubmitting}
                                 />
                             </Form>
                         </fieldset>
@@ -385,10 +406,10 @@ class WelcomePacketCheckList extends Component {
                                 <div className="addLabelModal">
                                     {/* <Button variant="primary" onClick={() => this.setState({ isShowAddLabelModal: true })}>Add new Item</Button> */}
                                     <Modal show={this.state.isShowAddLabelModal} onHide={this.handleCloseModal}>
-                                        <Modal.Header style={{fontFamily:'serif'}}>Checklist Item</Modal.Header>
+                                        <Modal.Header style={{ fontFamily: 'serif' }}>Checklist Item</Modal.Header>
                                         <Modal.Body>
                                             <label for="cbx-label">{this.state.isUpdatingLabel ? 'Update content below or cancel' : 'Enter new Item below'}</label>
-                                            <textarea 
+                                            <textarea
                                                 id="cbx-label"
                                                 name="cbx-label"
                                                 row="10" cols="50"

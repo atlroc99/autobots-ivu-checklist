@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { Button, ButtonGroup } from 'react-bootstrap';
 
 const AdminButton = (props) => {
-    console.log("inside admin button: isAdmin: ", props.isAdmin)
-    console.log("PROPS: ", props)
+    // console.log("inside admin button: isAdmin: ", props.isAdmin)
+    // console.log("PROPS: ", props)
     return (
         <div>
             <div className="row">
