@@ -31,7 +31,7 @@ const AdminButton = (props) => {
                 <div className="col col-md">
                     <Button type="submit"
                         onClick={props.saveChanges}
-                        variant="danger"
+                        variant={props.systemName.toLowerCase() === 'webctrl' ? 'danger' : 'primary' }
                         // disabled={!this.state.isComplete}
                         style={{ width: '100px', margin: '5px', marginLeft:'430px'}}>
                         <span style={{ marginRight: '15px' }}>Save</span>

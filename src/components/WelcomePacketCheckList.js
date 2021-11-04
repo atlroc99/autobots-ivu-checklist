@@ -13,10 +13,10 @@ import CHECKLIST from "./test";
 // const url = 'http://localhost:8000/checklists';
 
 // SAM LOCAL SERVER
-const url = 'http://localhost:3000/checklists'; 
+// const url = 'http://localhost:3000/checklists'; 
 
 // APIG
-// const url = 'https://k0neefoe9i.execute-api.us-west-1.amazonaws.com/v1/checklists';
+const url = 'https://k0neefoe9i.execute-api.us-west-1.amazonaws.com/v1/checklists';
 
 class WelcomePacketCheckList extends Component {
     constructor(props) {
@@ -58,6 +58,8 @@ class WelcomePacketCheckList extends Component {
             buttonValue_2: '',
             refresh: false,
 
+            systemName: '',
+
 
             // custom label for checklist
             isShowAddLabelModal: false,
@@ -82,6 +84,7 @@ class WelcomePacketCheckList extends Component {
         const serialNo = dealer.serialNumber.toLowerCase();
         const systemName = serialNo.startsWith("i") ? 'iVu' : serialNo.startsWith("w") ? 'webCTRL' : null;
         this.props.callme(systemName)
+        this.setState({systemName})
         // comment these lines out before npm run build for prod or connecting to remote
         // const response = CHECKLIST;
         // const dealer = { ...response }
@@ -334,7 +337,7 @@ class WelcomePacketCheckList extends Component {
             <div style={{ marginTop: '150px' }}>
                 <div className="row">
                     <div className="col col-6">
-                        <h2 style={{ fontFamily: 'serif', textTransform: 'capitalize' }}>Welcome Packet checklist</h2>
+                        <h2 style={{ fontFamily: 'serif', textTransform: 'capitalize'}}>Welcome Packet checklist</h2>
                         <h5 h2 style={{ fontFamily: 'serif', textTransform: 'capitalize', }}>{this.state.dealer.dealerName}</h5>
                     </div>
                     <div className="col col-6">
@@ -351,7 +354,7 @@ class WelcomePacketCheckList extends Component {
                     <div className="checklistBox">
                         <fieldset>
                             <Form className="p-4">
-                                <div className="title" style={{backgroundColor:this.state.dealer.uiTheme}}><i className="fas fa-list-alt"></i>  Welcome Packet Checklist - Beta(iVu)</div>
+                                <div className="title" style={{backgroundColor:this.state.dealer.uiTheme, paddingLeft:'15px'}}>Welcome Packet Checklist</div>
                                 <Table borderless hover size='lg'>
                                     <tbody style={{ fontFamily: 'serif', textAlign: 'justify' }}>
                                         {// render checklist
@@ -377,11 +380,13 @@ class WelcomePacketCheckList extends Component {
                                 {
                                     !this.state.isAdmin && !this.state.dealer.isCompleted ?
                                         <UserButton
+                                            systemName={this.state.systemName}
                                             update={this.update}
                                             submit={this.submit}
                                             isAdmin={this.state.isAdmin}
                                             isAllChecked={this.state.isComplete} />
                                         : this.state.isAdmin ? <AdminButton
+                                            systemName={this.state.systemName}
                                             isAdmin={this.state.isAdmin}
                                             isShowAddLabelModal={(yes) => { this.setState({ isShowAddLabelModal: yes }) }}
                                             cancelChanges={() => window.location.reload(false)}

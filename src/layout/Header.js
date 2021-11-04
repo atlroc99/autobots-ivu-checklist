@@ -10,7 +10,8 @@ const Header = (props) => {
     <div>
       {/**<Navbar bg="white" fixed="top" expand="lg"> */}
       <Navbar bg="white" expand="lg">
-        <Navbar.Brand href="/checklists/">
+        {/* <Navbar.Brand href="/checklists/"> */}
+        <Navbar.Brand href="#">
           <img className="logo"
             src={props.systemName === 'iVu' ? iVuLogo : props.systemName === 'webCTRL' ? wcLogo : ''}
             style={headerStyle}>

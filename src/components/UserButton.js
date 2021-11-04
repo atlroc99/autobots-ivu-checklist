@@ -18,7 +18,7 @@ const UserButton = (props) => {
             </Button>
             <Button type="submit"
                 onClick={props.submit}
-                variant="danger"
+                variant={props.systemName.toLowerCase() === 'webctrl' ? 'danger' : 'primary' }
                 disabled={!props.isAllChecked} // if all checked enable update
                 style={{ width: '200px', margin: '5px' }}>
                 <span style={{ marginRight: '15px' }}>Submit</span>
