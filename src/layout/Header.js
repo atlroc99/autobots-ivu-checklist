@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Navbar } from 'react-bootstrap';
 import wcLogo from '../image/WebCTRL_Cloud_(BkT)_Final.png';
 import iVuLogo from '../image/i-Vu_Cloud_dark_bg.png';
-
+import { AmplifySignOut, withAuthenticator } from '@aws-amplify/ui-react';
 // const Header = ({onClick}) => {
 const Header = (props) => {
   const [logo, setLogo] = useState('');
@@ -10,6 +10,7 @@ const Header = (props) => {
     <div>
       {/**<Navbar bg="white" fixed="top" expand="lg"> */}
       <Navbar bg="white" expand="lg">
+      <AmplifySignOut />
         {/* <Navbar.Brand href="/checklists/"> */}
         <Navbar.Brand href="#">
           <img className="logo"

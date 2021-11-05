@@ -6,22 +6,34 @@ import WelcomePacketCheckList from './components/WelcomePacketCheckList';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Footer from './layout/Footer';
 
+// import Amplify from 'aws-amplify';
+// import awsconfig from './aws-exports';
+// import { AmplifySignOut, withAuthenticator } from '@aws-amplify/ui-react';
+
+import Amplify from 'aws-amplify';
+import awsconfig from './aws-exports';
+import { AmplifySignOut, withAuthenticator } from '@aws-amplify/ui-react';
+
+Amplify.configure(awsconfig)
+
 function App() {
   const [systemName, setSystemName] = useState('systemName-ivu');
   return (
-    <div  className="container" style={{background:'white'}}>
-        <Header test="someData" systemName={systemName}/>
-        <BrowserRouter>
-          <Switch>
-            {/* the WelcomePacketCheckList (child of this component) needs to call callme and pass systemName */}
-            <Route exact path='/checklist/:dealership'  render={(props) => <WelcomePacketCheckList {...props.match.params} 
-            callme={(sysName) => setSystemName(sysName)}/>} />
-          </Switch>
-        </BrowserRouter>
-        <Footer/>
+    <div className="container" style={{ background: 'white' }}>
+      <Header test="someData" systemName={systemName}>
+        <AmplifySignOut />
+      </Header>
+      <BrowserRouter>
+        <Switch>
+          {/* the WelcomePacketCheckList (child of this component) needs to call callme and pass systemName */}
+          <Route exact path='/checklist/:dealership' render={(props) => <WelcomePacketCheckList {...props.match.params}
+            callme={(sysName) => setSystemName(sysName)} />} />
+        </Switch>
+      </BrowserRouter>
+      <Footer />
     </div>
-)
-// return (
+  )
+  // return (
   //   <div className="container">
   //     <Layout>
   //       <BrowserRouter>
@@ -36,4 +48,4 @@ function App() {
   // )
 }
 
-export default App;
+export default withAuthenticator(App);
