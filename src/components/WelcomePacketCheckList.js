@@ -78,7 +78,7 @@ class WelcomePacketCheckList extends Component {
         console.log('Hi, from WelcomePacketChecklist!', this.props);
         //Comment these lines out if running locally
         // const response = await axios.get(url + `/${this.props.match.params.dealership}`);
-        const response = await axios.get(url + `/${this.props.dealership}`);
+        const response = await axios.get(url + `/${encodeURI(this.props.dealership)}`);
         const dealer = { ...response.data }
         
         const serialNo = dealer.serialNumber.toLowerCase();
