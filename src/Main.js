@@ -22,8 +22,7 @@ function App() {
       <BrowserRouter>
         <Switch>
           {/* the WelcomePacketCheckList (child of this component) needs to call callme and pass systemName */}
-          {/* <Route exact path='/checklist/:dealership' render={(props) => <WelcomePacketCheckList {...props.match.params} */}
-          <Route exact path='/checklist/:dealerId' render={(props) => <WelcomePacketCheckList {...props.match.params}
+          <Route exact path='/checklist/:dealership' render={(props) => <WelcomePacketCheckList {...props.match.params}
             callme={(sysName) => setSystemName(sysName)} />} />
         </Switch>
       </BrowserRouter>

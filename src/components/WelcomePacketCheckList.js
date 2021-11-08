@@ -13,10 +13,10 @@ import CHECKLIST from "./test";
 // const url = 'http://localhost:8000/checklists';
 
 // SAM LOCAL SERVER
-// const url = 'http://localhost:3000/checklists'; 
+const url = 'http://localhost:3000/checklists'; 
 
 // APIG
-const url = 'https://k0neefoe9i.execute-api.us-west-1.amazonaws.com/v1/checklists';
+// const url = 'https://k0neefoe9i.execute-api.us-west-1.amazonaws.com/v1/checklists';
 
 class WelcomePacketCheckList extends Component {
     constructor(props) {
@@ -79,7 +79,7 @@ class WelcomePacketCheckList extends Component {
         console.log('Hi, from WelcomePacketChecklist!', this.props);
         //Comment these lines out if running locally
         // const response = await axios.get(url + `/${this.props.match.params.dealership}`);
-        const response = await axios.get(url + `/${encodeURI(this.props.dealerId)}`);
+        const response = await axios.get(url + `/${this.props.dealership}`);
         const dealer = { ...response.data }
         
         const serialNo = dealer.serialNumber.toLowerCase();
@@ -139,13 +139,12 @@ class WelcomePacketCheckList extends Component {
 
     update = async (e) => {
         e.preventDefault();
-        // const dealershipName = this.state.dealer.dealerName ? this.state.dealer.dealerName : 'NIL';
-        const dealerId = this.state.dealer.dealerId ? this.state.dealer.dealerId : 'NIL';
+        const dealershipName = this.state.dealer.dealerName ? this.state.dealer.dealerName : 'NIL';
 
         const payload = JSON.stringify(this.state.dealer);
         this.setState({ isUpdating: true })
 
-        const response = await axios.put(`${url}/${dealerId}?update=true`, payload);
+        const response = await axios.put(`${url}/${dealershipName}?update=true`, payload);
         const str_val = JSON.stringify(response.data);
         const data = JSON.parse(str_val)
 
@@ -178,13 +177,13 @@ class WelcomePacketCheckList extends Component {
         this.setState({ modalBody: '' });
     }
 
+    // when date is chosen and okay is clicked on the modal
     handleAcceptDataSubmission = async (event) => {
         console.log('Message Acknowledged ...submitted form')
         this.setState({ checkListSubmitted: true });
         console.log('submitting data: ', this.state.dealer);
         const requestBody = JSON.stringify(this.state.dealer)
-        // const post_url = `${url}/${this.state.dealer.dealerName}?submit=${true}`;
-        const post_url = `${url}/${this.state.dealer.dealerId}?submit=${true}`;
+        const post_url = `${url}/${this.state.dealer.dealerName}?submit=${true}`;
         console.log('submitting to url: ', post_url)
         const response = await axios.post(post_url, requestBody);
         this.setState({ showModal: false })
