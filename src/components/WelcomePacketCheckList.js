@@ -13,10 +13,10 @@ import CHECKLIST from "./test";
 // const url = 'http://localhost:8000/checklists';
 
 // SAM LOCAL SERVER
-const url = 'http://localhost:3000/checklists'; 
+// const url = 'http://localhost:3000/checklists'; 
 
 // APIG
-// const url = 'https://k0neefoe9i.execute-api.us-west-1.amazonaws.com/v1/checklists';
+const url = 'https://k0neefoe9i.execute-api.us-west-1.amazonaws.com/v1/checklists';
 
 class WelcomePacketCheckList extends Component {
     constructor(props) {
