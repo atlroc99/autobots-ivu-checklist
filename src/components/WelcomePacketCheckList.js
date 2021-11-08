@@ -24,7 +24,7 @@ class WelcomePacketCheckList extends Component {
         this.state = {
             isAdmin: false,
             dealer: {
-                dealerId: dealerId,
+                dealerId: '',
                 checklists: [],
                 dealerName: '',
                 accountNumber: '',
